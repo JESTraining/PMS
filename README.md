@@ -50,13 +50,13 @@ A comprehensive **Patient Management System** designed to digitize and streamlin
 
 | Layer | Technology |
 |-------|------------|
-| **Frontend** | React.js / Vue.js (or specify) |
-| **Backend** | Node.js / Python (Django) / Java (Spring Boot) |
-| **Database** | PostgreSQL / MySQL |
-| **ORM** | Prisma / SQLAlchemy / Hibernate |
+| **Frontend** | Angular 21|
+| **Backend** |.NET|
+| **Database** | MS SQL |
+| **ORM** | Entity Framework|
 | **Authentication** | JWT, OAuth2, RBAC |
 | **Integration** | HL7 / FHIR standards |
-| **Infrastructure** | Docker, AWS / Azure |
+| **Infrastructure** | Docker |
 
 ---
 
