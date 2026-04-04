@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Tests/Tests.csproj" />
+  <Project Path="WebServices/WebServices.csproj" Id="445f00ae-a26e-4a48-ac30-768f5c0dc105" />
 </Solution>
