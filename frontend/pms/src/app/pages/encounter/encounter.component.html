@@ -1,42 +1,66 @@
 <div class="min-h-screen bg-gray-100 p-8">
   <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
 
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-      <h2 class="text-2xl font-semibold text-gray-800">Encounters Management</h2>
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-semibold text-gray-800">
+        Encounters
+      </h2>
     </div>
 
+    <!-- TABLE -->
     <div class="overflow-x-auto border border-gray-200 rounded-lg">
       <table class="min-w-full divide-y divide-gray-200">
+
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient Name</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start Time</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">End Time</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">End</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th>
           </tr>
         </thead>
+
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let encounter of encountersData()" class="hover:bg-gray-50 transition">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ encounter.patientName }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{{ encounter.startTime }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ encounter.endTime }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ encounter.encounterReason }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button (click)="openEncounterModal(encounter)" class="text-blue-600 hover:text-blue-900 mr-4">Enter Encounter</button>
+          <tr *ngFor="let encounter of encounters()" class="hover:bg-gray-50">
+
+            <td class="px-6 py-4 text-sm text-gray-700">
+              {{ encounter.patientName }}
+            </td>
+
+            <td class="px-6 py-4 text-sm">
+              {{ encounter.startTime }}
+            </td>
+
+            <td class="px-6 py-4 text-sm">
+              {{ encounter.endTime }}
+            </td>
+
+            <td class="px-6 py-4 text-sm text-gray-600">
+              {{ encounter.encounterReason }}
+            </td>
+
+            <td class="px-6 py-4 text-right">
+              <button
+                (click)="goToDetail(encounter.encounterId)"
+                class="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Open
+              </button>
+            </td>
+
+          </tr>
+
+          <tr *ngIf="encounters().length === 0">
+            <td colspan="5" class="text-center py-10 text-gray-500 italic">
+              No encounters found
             </td>
           </tr>
-          <tr *ngIf="encountersData().length === 0">
-            <td colspan="6" class="px-6 py-12 text-center text-gray-500 italic">No encounters found.</td>
-          </tr>
         </tbody>
+
       </table>
     </div>
+
   </div>
-  <app-encounter-modal
-    *ngIf="showModal()"
-    [encounter]="currentEncounter"
-    (save)="onSave($event)"
-    (close)="closeModal()"
-  ></app-encounter-modal>
 </div>

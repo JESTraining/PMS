@@ -1,5 +1,5 @@
 interface conditionInterface {
-  conditionId: number;
+  id: number;
   encounterId: number;
   code: string;
   displayName: string;

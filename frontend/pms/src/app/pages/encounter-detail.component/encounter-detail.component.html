@@ -1,0 +1,684 @@
+<div *ngIf="encounter() as e" class="p-6 space-y-6 bg-gray-50">
+
+  <!-- 🧑 INFO PACIENTE -->
+  <div class="bg-white rounded-2xl shadow border border-gray-100 p-5">
+
+    <div class="flex justify-between items-start mb-4">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">
+          {{ e.patientName }}
+        </h2>
+        <p class="text-sm text-gray-400">
+          Información de la cita
+        </p>
+      </div>
+
+      <button
+        class="text-blue-500 hover:text-blue-600 text-sm font-medium"
+        (click)="startAppointmentEdit(e)">
+        ✏️ Editar
+      </button>
+    </div>
+
+    <!-- VIEW -->
+    <div *ngIf="editingAppointment() === false" class="space-y-2 text-sm">
+
+      <div class="flex justify-between border-b pb-2">
+        <span class="text-gray-500">Motivo</span>
+        <span class="font-medium text-gray-800">
+          {{ e.appointment.reason }}
+        </span>
+      </div>
+
+      <div class="flex justify-between border-b pb-2">
+        <span class="text-gray-500">Inicio</span>
+        <span class="text-gray-700">
+          {{ e.appointment.startTime }}
+        </span>
+      </div>
+
+      <div class="flex justify-between">
+        <span class="text-gray-500">Fin</span>
+        <span class="text-gray-700">
+          {{ e.appointment.endTime }}
+        </span>
+      </div>
+
+    </div>
+
+    <!-- EDIT -->
+    <div *ngIf="editingAppointment()" class="space-y-3">
+
+      <input
+        [(ngModel)]="editedAppointment().reason"
+        placeholder="Motivo"
+        class="w-full border border-gray-200 p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+      />
+
+      <input
+        type="datetime-local"
+        [(ngModel)]="editedAppointment().startTime"
+        class="w-full border border-gray-200 p-2 rounded-lg"
+      />
+
+      <input
+        type="datetime-local"
+        [(ngModel)]="editedAppointment().endTime"
+        class="w-full border border-gray-200 p-2 rounded-lg"
+      />
+
+      <div class="flex gap-2 pt-2">
+        <button
+          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+          (click)="saveAppointment()">
+          💾 Guardar
+        </button>
+
+        <button
+          class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+          (click)="cancelAppointmentEdit()">
+          ❌ Cancelar
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 🧪 OBSERVACIONES -->
+  <div class="bg-white rounded-2xl shadow border border-gray-100 p-5">
+
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold text-gray-800">
+        Observaciones
+      </h3>
+
+      <button
+        class="text-green-500 hover:text-green-600 text-sm font-medium"
+        (click)="startCreateObservation()">
+        ➕ Agregar
+      </button>
+    </div>
+
+    <!-- CREATE -->
+    <div *ngIf="creatingObservation()" class="bg-gray-50 border rounded-xl p-4 mb-4 space-y-3">
+
+      <input
+        placeholder="Nombre"
+        [(ngModel)]="newObservation().displayName"
+        class="w-full border border-gray-200 p-2 rounded-lg"
+      />
+
+      <input
+        type="number"
+        placeholder="Valor"
+        [(ngModel)]="newObservation().valueQuantity"
+        class="w-full border border-gray-200 p-2 rounded-lg"
+      />
+
+      <input
+        placeholder="Unidad"
+        [(ngModel)]="newObservation().unit"
+        class="w-full border border-gray-200 p-2 rounded-lg"
+      />
+
+      <div class="flex gap-2 pt-2">
+        <button
+          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+          (click)="saveNewObservation()">
+          💾 Guardar
+        </button>
+
+        <button
+          class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+          (click)="cancelCreateObservation()">
+          ❌ Cancelar
+        </button>
+      </div>
+
+    </div>
+
+    <!-- LIST -->
+    <div class="space-y-4">
+
+      <div
+        *ngFor="let obs of e.clinicalObservations"
+        class="border-b border-gray-100 pb-4">
+
+        <!-- VIEW -->
+        <div *ngIf="editingObservationId() !== obs.id" class="flex justify-between items-center">
+
+          <div>
+            <p class="font-medium text-gray-800">
+              {{ obs.displayName }}
+            </p>
+
+            <p class="text-sm text-gray-600">
+              {{ obs.valueQuantity }} {{ obs.unit }}
+            </p>
+
+            <p class="text-xs text-gray-400">
+              {{ obs.effectiveDate }}
+            </p>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              class="text-blue-500 hover:text-blue-600 text-sm"
+              (click)="startObservationEdit(obs)">
+              ✏️
+            </button>
+
+            <button
+              class="text-red-500 hover:text-red-600 text-sm"
+              (click)="deleteObservation(obs.id)">
+              🗑
+            </button>
+          </div>
+
+        </div>
+
+        <!-- EDIT -->
+        <div *ngIf="editingObservationId() === obs.id" class="space-y-3">
+
+          <input
+            [ngModel]="editedObservation()?.displayName"
+            (ngModelChange)="editedObservation.set({ ...editedObservation(), displayName: $event })"
+            class="w-full border border-gray-200 p-2 rounded-lg"
+          />
+
+          <input
+            type="number"
+            [(ngModel)]="editedObservation().valueQuantity"
+            class="w-full border border-gray-200 p-2 rounded-lg"
+          />
+
+          <input
+            [(ngModel)]="editedObservation().unit"
+            class="w-full border border-gray-200 p-2 rounded-lg"
+          />
+
+          <div class="flex gap-2 pt-2">
+            <button
+              class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+              (click)="saveObservation(obs.id)">
+              💾 Guardar
+            </button>
+
+            <button
+              class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+              (click)="cancelObservationEdit()">
+              ❌ Cancelar
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 🩺 Condiciones -->
+ <!-- 🩺 Condiciones -->
+<div class="bg-white rounded-2xl shadow border border-gray-100 p-5">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-lg font-semibold text-gray-800">
+      Condiciones
+    </h3>
+
+    <button
+      class="text-green-500 hover:text-green-600 text-sm font-medium"
+      (click)="startCreateCondition()"
+    >
+      ➕ Agregar
+    </button>
+  </div>
+
+  <!-- CREATE -->
+  <div *ngIf="creatingCondition()" class="bg-gray-50 border rounded-xl p-4 mb-4 space-y-3">
+
+    <input
+      placeholder="Código (ej: I10)"
+      [(ngModel)]="newCondition().code"
+      class="w-full border border-gray-200 p-2 rounded-lg"
+    />
+
+    <input
+      placeholder="Nombre (ej: Hipertensión)"
+      [(ngModel)]="newCondition().displayName"
+      class="w-full border border-gray-200 p-2 rounded-lg"
+    />
+
+    <select
+      [(ngModel)]="newCondition().clinicalStatus"
+      class="w-full border border-gray-200 p-2 rounded-lg"
+    >
+      <option>Active</option>
+      <option>Inactive</option>
+      <option>Resolved</option>
+      <option>Remission</option>
+    </select>
+
+    <div class="flex gap-2 pt-2">
+      <button
+        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+        (click)="saveNewCondition()"
+      >
+        💾 Guardar
+      </button>
+
+      <button
+        class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+        (click)="cancelCreateCondition()"
+      >
+        ❌ Cancelar
+      </button>
+    </div>
+
+  </div>
+
+  <!-- LIST -->
+  <div class="space-y-4">
+
+    <div
+      *ngFor="let c of e.conditions"
+      class="border-b border-gray-100 pb-4"
+    >
+
+      <!-- VIEW -->
+      <div *ngIf="editingConditionId() !== c.id" class="flex justify-between items-center">
+
+        <div>
+          <p class="font-medium text-gray-800">
+            {{ c.displayName }}
+          </p>
+
+          <p class="text-sm text-gray-500">
+            Estado:
+            <span class="font-medium text-gray-700">
+              {{ c.clinicalStatus }}
+            </span>
+          </p>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            class="text-blue-500 hover:text-blue-600 text-sm"
+            (click)="startConditionEdit(c)"
+          >
+            ✏️
+          </button>
+
+          <button
+            class="text-red-500 hover:text-red-600 text-sm"
+            (click)="deleteCondition(c.id)"
+          >
+            🗑
+          </button>
+        </div>
+
+      </div>
+
+      <!-- EDIT -->
+      <div *ngIf="editingConditionId() === c.id" class="space-y-3">
+
+        <input
+          [(ngModel)]="editedCondition().displayName"
+          class="w-full border border-gray-200 p-2 rounded-lg"
+        />
+
+        <select
+          [(ngModel)]="editedCondition().clinicalStatus"
+          class="w-full border border-gray-200 p-2 rounded-lg"
+        >
+          <option>Active</option>
+          <option>Inactive</option>
+          <option>Resolved</option>
+          <option>Remission</option>
+        </select>
+
+        <div class="flex gap-2 pt-2">
+          <button
+            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+            (click)="saveCondition(c.id)"
+          >
+            💾 Guardar
+          </button>
+
+          <button
+            class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+            (click)="cancelConditionEdit()"
+          >
+            ❌ Cancelar
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+  <!-- 💊 Prescripciones -->
+    <!-- 💊 Prescripciones -->
+  <div class="bg-white rounded-2xl shadow border border-gray-100 p-5">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold text-gray-800">
+        Prescripciones
+      </h3>
+
+      <button
+        class="text-green-500 hover:text-green-600 text-sm font-medium"
+        (click)="startCreatePrescription()"
+      >
+        ➕ Agregar
+      </button>
+    </div>
+
+    <!-- CREATE -->
+    <div *ngIf="creatingPrescription()" class="bg-gray-50 border rounded-xl p-4 mb-4 space-y-4">
+
+      <!-- Fecha -->
+      <input
+        type="date"
+        [(ngModel)]="newPrescription().issueDate"
+        class="w-full border border-gray-200 p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+      />
+
+      <!-- MEDICATIONS -->
+      <div
+        *ngFor="let m of newPrescription().medications; let i = index"
+        class="border border-gray-200 rounded-xl p-3 space-y-2 bg-white"
+      >
+
+        <select
+          [(ngModel)]="m.medicationId"
+          class="w-full border border-gray-200 p-2 rounded-lg"
+        >
+          <option [value]="0">Seleccionar medicamento</option>
+
+          <option
+            *ngFor="let med of medicationsCatalog()"
+            [value]="med.id"
+          >
+            {{ med.name }}
+          </option>
+        </select>
+
+        <input
+          [(ngModel)]="m.dosage"
+          placeholder="Dosage"
+          class="w-full border border-gray-200 p-2 rounded-lg"
+        />
+
+        <input
+          type="number"
+          [(ngModel)]="m.refills"
+          placeholder="Refills"
+          class="w-full border border-gray-200 p-2 rounded-lg"
+        />
+
+        <button
+          class="text-red-500 text-sm hover:text-red-600"
+          (click)="removeMedicationRow(i)"
+        >
+          ❌ Quitar
+        </button>
+
+      </div>
+
+      <!-- ADD ROW -->
+      <button
+        class="text-blue-500 text-sm font-medium hover:text-blue-600"
+        (click)="addMedicationRow()"
+      >
+        ➕ Añadir medicamento
+      </button>
+
+      <!-- ACTIONS -->
+      <div class="flex gap-2 pt-2">
+        <button
+          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+          (click)="saveNewPrescription()"
+        >
+          💾 Guardar
+        </button>
+
+        <button
+          class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+          (click)="cancelCreatePrescription()"
+        >
+          ❌ Cancelar
+        </button>
+      </div>
+
+    </div>
+
+    <!-- LIST -->
+    <div class="space-y-4">
+
+      <div
+        *ngFor="let p of e.prescriptions"
+        class="border-b border-gray-100 pb-4"
+      >
+
+        <!-- VIEW -->
+        <div *ngIf="editingPrescriptionId() !== p.id" class="flex justify-between gap-4">
+
+          <div class="flex-1">
+            <p class="font-medium text-gray-800 mb-1">
+              📅 {{ p.issueDate }}
+            </p>
+
+            <div class="space-y-1 ml-2">
+              <div
+                *ngFor="let m of p.medications"
+                class="text-sm text-gray-600 bg-gray-50 px-2 py-1 rounded"
+              >
+                {{ m.medication?.name }} — {{ m.dosage }}
+                <span class="text-gray-400">
+                  (Refills: {{ m.refills }})
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <button
+              class="text-blue-500 hover:text-blue-600 text-sm"
+              (click)="startPrescriptionEdit(p)"
+            >
+              ✏️
+            </button>
+
+            <button
+              class="text-red-500 hover:text-red-600 text-sm"
+              (click)="deletePrescription(p.id)"
+            >
+              🗑
+            </button>
+          </div>
+
+        </div>
+
+        <!-- EDIT -->
+        <div *ngIf="editingPrescriptionId() === p.id" class="space-y-3">
+
+          <input
+            type="date"
+            [(ngModel)]="editedPrescription().issueDate"
+            class="w-full border border-gray-200 p-2 rounded-lg"
+          />
+
+          <div
+            *ngFor="let m of editedPrescription().medications; let i = index"
+            class="border border-gray-200 rounded-lg p-3 space-y-2"
+          >
+
+            <p class="font-medium text-gray-700">
+              {{ m.medication?.name }}
+            </p>
+
+            <input
+              [(ngModel)]="m.dosage"
+              placeholder="Dosage"
+              class="w-full border border-gray-200 p-2 rounded-lg"
+            />
+
+            <input
+              type="number"
+              [(ngModel)]="m.refills"
+              placeholder="Refills"
+              class="w-full border border-gray-200 p-2 rounded-lg"
+            />
+
+          </div>
+
+          <div class="flex gap-2 pt-2">
+            <button
+              class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+              (click)="savePrescription(p.id)"
+            >
+              💾 Guardar
+            </button>
+
+            <button
+              class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+              (click)="cancelPrescriptionEdit()"
+            >
+              ❌ Cancelar
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  <!-- 📝 Notas clínicas -->
+  <!-- 📝 Notas Clínicas -->
+<div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="font-semibold text-gray-800 text-lg">
+      📝 Notas Clínicas
+    </h3>
+  </div>
+
+  <!-- Lista de notas -->
+  <div *ngFor="let note of e.clinicalNotes" class="border-b last:border-none py-4 space-y-3">
+
+    <!-- VIEW MODE -->
+    <div *ngIf="editingSection() !== 'notes'" class="space-y-3">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-xs text-gray-400 mb-1">Subjetivo</p>
+          <p class="text-sm text-gray-700">
+            {{ note.subjective || '—' }}
+          </p>
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-xs text-gray-400 mb-1">Objetivo</p>
+          <p class="text-sm text-gray-700">
+            {{ note.objective || '—' }}
+          </p>
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-xs text-gray-400 mb-1">Evaluación</p>
+          <p class="text-sm text-gray-700">
+            {{ note.assessment || '—' }}
+          </p>
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg">
+          <p class="text-xs text-gray-400 mb-1">Plan</p>
+          <p class="text-sm text-gray-700">
+            {{ note.plan || '—' }}
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end">
+        <button
+          class="text-blue-500 hover:text-blue-700 text-sm font-medium transition"
+          (click)="startEdit('notes', note)"
+        >
+          ✏️ Editar
+        </button>
+      </div>
+
+    </div>
+
+    <!-- EDIT MODE -->
+    <div *ngIf="editingSection() === 'notes'" class="space-y-3">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+        <textarea
+          [(ngModel)]="editedNote().subjective"
+          placeholder="Subjetivo"
+          class="w-full border border-gray-200 p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+        ></textarea>
+
+        <textarea
+          [(ngModel)]="editedNote().objective"
+          placeholder="Objetivo"
+          class="w-full border border-gray-200 p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+        ></textarea>
+
+        <textarea
+          [(ngModel)]="editedNote().assessment"
+          placeholder="Evaluación"
+          class="w-full border border-gray-200 p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+        ></textarea>
+
+        <textarea
+          [(ngModel)]="editedNote().plan"
+          placeholder="Plan"
+          class="w-full border border-gray-200 p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+        ></textarea>
+
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-2 pt-2">
+
+        <button
+          class="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm transition"
+          (click)="saveNote()"
+        >
+          💾 Guardar
+        </button>
+
+        <button
+          class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-1.5 rounded-lg text-sm transition"
+          (click)="cancelEdit()"
+        >
+          ❌ Cancelar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

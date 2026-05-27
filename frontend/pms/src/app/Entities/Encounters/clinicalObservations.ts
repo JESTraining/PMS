@@ -1,5 +1,5 @@
 interface clinicalObservationsInterface {
-  observationId: number;
+  id: number;
   encounterId: number;
   category: string;
   code: string;

@@ -3,8 +3,10 @@ using Domain.SharedConstants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using WebServices.DataAccess;
 using WebServices.SharedBusiness;
+using static WebServices.SharedBusiness.PrescriptionProcess;
 
 namespace WebServices.Controllers.Encounter 
 {
@@ -104,6 +106,185 @@ namespace WebServices.Controllers.Encounter
         {
             var result = await _encounterProcess.CompleteEncounterAsync(id);
             return Ok(result);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDetail(int id)
+        {
+            var result = await _encounterProcess.GetEncounterDetailAsync(id);
+            return Ok(result);
+        }
+        [HttpPost("{encounterId}/observations")]
+        public async Task<IActionResult> AddObservation(int encounterId, CreateObservationDto dto)
+        {
+            var result = await _encounterProcess.AddObservationAsync(encounterId, dto);
+            if (!result) return NotFound();
+
+            return Ok();
+        }
+        [HttpPut("{encounterId}/observations/{observationId}")]
+        public async Task<IActionResult> UpdateObservation(
+        int encounterId,
+        int observationId,
+        [FromBody] UpdateObservationDto dto)
+        {
+            var result = await _encounterProcess.UpdateObservationAsync(observationId, dto);
+
+            if (!result) return NotFound();
+
+            return NoContent();
+        }
+        [HttpPut("{encounterId}/conditions/{conditionId}")]
+        public async Task<IActionResult> UpdateCondition(
+        int encounterId, 
+        int conditionId,
+        [FromBody] CreateConditionDto dto)
+        {
+            var result = await _encounterProcess.UpdateConditionAsync(encounterId, conditionId, dto);
+
+            if (!result)
+                return NotFound();
+
+            return NoContent(); // 🔥 mejor práctica para PUT
+        }
+        [HttpPost("{encounterId}/conditions")]
+        public async Task<IActionResult> AddCondition(int encounterId, [FromBody] CreateConditionDto dto)
+        {
+            var encounter = await _context.Encounters
+                .Include(e => e.Conditions)
+                .FirstOrDefaultAsync(e => e.Id == encounterId);
+
+            if (encounter == null)
+                return NotFound("Encounter not found");
+
+            var condition = new Condition
+            {
+                Code = dto.Code,
+                DisplayName = dto.DisplayName,
+                ClinicalStatus = Enum.Parse<ConditionClinicalStatus>(
+                dto.ClinicalStatus,
+                true
+            )
+            };
+
+            encounter.Conditions.Add(condition);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(condition);
+        }
+        [HttpPost("{encounterId}/prescriptions")]
+        public async Task<IActionResult> CreatePrescription(
+        int encounterId,
+        [FromBody] UpdatePrescriptionDto dto)
+            {
+                var encounter = await _context.Encounters
+                    .Include(e => e.Prescriptions)
+                    .FirstOrDefaultAsync(e => e.Id == encounterId);
+
+                if (encounter == null)
+                    return NotFound();
+
+                var prescription = new Prescriptions
+                {
+                    IssueDate = dto.IssueDate,
+                    DoctorId = encounter.DoctorId,
+                    PatientId = encounter.PatientId,
+                    Medications = dto.Medications.Select(m => new PrescriptionMedication
+                    {
+                        MedicationId = m.MedicationId,
+                        Dosage = m.Dosage,
+                        Refills = m.Refills
+                    }).ToList()
+                };
+
+                encounter.Prescriptions.Add(prescription);
+
+                await _context.SaveChangesAsync();
+
+                return Ok(prescription);
+            }
+
+        [HttpPut("{encounterId}/prescriptions/{prescriptionId}")]
+        public async Task<IActionResult> UpdatePrescription(
+        int encounterId,
+        int prescriptionId,
+        [FromBody] UpdatePrescriptionDto dto)
+        {
+            var result = await _encounterProcess.UpdatePrescriptionAsync(
+                encounterId,
+                prescriptionId,
+                dto
+            );
+
+            if (!result)
+                return NotFound("Prescription not found for the given encounter.");
+
+            return Ok(result);
+        }
+        [HttpPut("{encounterId}/appointment")]
+        public async Task<IActionResult> UpdateAppointment(
+        int encounterId,
+        [FromBody] UpdateAppointmentDto dto)
+            {
+                var encounter = await _context.Encounters
+                    .Include(e => e.Appointment)
+                    .FirstOrDefaultAsync(e => e.Id == encounterId);
+
+                if (encounter?.Appointment == null)
+                    return NotFound();
+
+                encounter.Appointment.Reason = dto.Reason;
+                encounter.Appointment.StartTime = dto.StartTime;
+                encounter.Appointment.EndTime = dto.EndTime;
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+        }
+        [HttpDelete("{encounterId}/prescriptions/{prescriptionId}")]
+        public async Task<IActionResult> DeletePrescription(int encounterId, int prescriptionId)
+        {
+            var prescription = await _context.DBPrescriptions
+                .FirstOrDefaultAsync(p => p.Id == prescriptionId && p.EncounterId == encounterId);
+
+            if (prescription == null)
+                return NotFound();
+
+            _context.DBPrescriptions.Remove(prescription);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpDelete("{encounterId}/observations/{observationId}")]
+        public async Task<IActionResult> DeleteObservation(int encounterId, int observationId)
+        {
+            var observation = await _context.ClinicalObservations
+                .FirstOrDefaultAsync(o => o.Id == observationId && o.EncounterId == encounterId);
+
+            if (observation == null)
+                return NotFound();
+
+            _context.ClinicalObservations.Remove(observation);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpDelete("{encounterId}/conditions/{conditionId}")]
+        public async Task<IActionResult> DeleteCondition(int encounterId, int conditionId)
+        {
+            var condition = await _context.Conditions
+                .FirstOrDefaultAsync(c => c.Id == conditionId && c.EncounterId == encounterId);
+
+            if (condition == null)
+                return NotFound();
+
+            _context.Conditions.Remove(condition);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

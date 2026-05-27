@@ -9,7 +9,8 @@ import { EncounterComponent } from './pages/encounter/encounter.component';
 import { PatientRegistrationComponent } from './pages/patient-registration/patient-registration.component';
 import { UsersList } from './pages/users-list/users-list';
 import { ScheduleComponent } from './pages/schedule/schedule.component';
-import {PrescriptionsList} from './pages/prescriptions-list/prescriptions-list'
+import {PrescriptionsList} from './pages/prescriptions-list/prescriptions-list';
+import {EncounterDetailComponent} from './pages/encounter-detail.component/encounter-detail.component';
 
 export const routes: Routes = [
 
@@ -32,7 +33,8 @@ export const routes: Routes = [
       { path: 'doctor-rest-time', component: DoctorRestTimeFormComponent },
       { path: 'encounters', component: EncounterComponent },
       { path: 'prescriptions', component: PrescriptionsList },
-      { path: 'prescriptions', component: PrescriptionsList }
+      { path: 'prescriptions', component: PrescriptionsList },
+      {path: 'encounters/:id',component: EncounterDetailComponent}
     ]
   },
 

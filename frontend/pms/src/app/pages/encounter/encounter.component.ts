@@ -1,64 +1,44 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { EncounterModal } from '../encounter-modal/encounter-modal';
+import { Router } from '@angular/router';
 import { EncounterService } from '../../services/encounter/encounter.service';
-import { EncounterInterface } from '../../Entities/Encounters/Encounter';
+import { EncounterListItem } from '../../Entities/Encounters/Encounter';
 
 @Component({
-  selector: 'app-encounter.component',
-  imports: [CommonModule, FormsModule, EncounterModal],
+  selector: 'app-encounter',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './encounter.component.html',
-  styleUrl: './encounter.component.css',
 })
 export class EncounterComponent implements OnInit {
-  encountersData = signal<EncounterInterface[]>([]);
-  currentEncounter: EncounterInterface = {
-    EncounterId: 0,
-    patientName: '',
-    startTime: '',
-    endTime: '',
-    encounterReason: '',
-    conditions: [],
-    clinicalObservations: [],
-    clinicalNotes: [],
-    prescriptions: []
-  };
-  showModal = signal<boolean>(false);
-  isSaving = signal<boolean>(false);
-  constructor(private encounterService: EncounterService) {}
+
+  encounters = signal<EncounterListItem[]>([]);
+  loading = signal<boolean>(false);
+
+  constructor(
+    private encounterService: EncounterService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadEncounters();
   }
 
   loadEncounters(): void {
+    this.loading.set(true);
+
     this.encounterService.getEncounters().subscribe({
-      next: (encounters) => {
-        this.encountersData.set(encounters);
-        console.log('Loaded encounters:', encounters);
+      next: (data) => {
+        this.encounters.set(data);
       },
-      error: (error) => {
-        console.error('Error loading encounters:', error);
-        alert('Failed to load encounters. Please try again.');
-      }
+      error: (err) => {
+        console.error(err);
+      },
+      complete: () => this.loading.set(false)
     });
   }
 
-  openEncounterModal(encounter: EncounterInterface): void {
-    this.currentEncounter = { ...encounter };
-    this.showModal.set(true);
-  }
-
-  onSave(updatedEncounter: EncounterFormInterface): void {
-    // Here you would typically call a service method to save the updated encounter
-    console.log('Saving encounter:', updatedEncounter);
-    this.showModal.set(false);
-    // After saving, you might want to reload the encounters list
-    this.loadEncounters();
-  }
-
-  closeModal(): void {
-    this.showModal.set(false);
+  goToDetail(id: number): void {
+    this.router.navigate(['/encounters', id]);
   }
 }

@@ -18,6 +18,13 @@ export class EncounterModal implements OnChanges {
     startTime: '',
     endTime: '',
     encounterReason: '',
+    appointment: {
+      id: 0,
+      reason: '',
+      startTime: '',
+      endTime: ''
+    },
+
     conditions: [],
     clinicalObservations: [],
     clinicalNotes: [],

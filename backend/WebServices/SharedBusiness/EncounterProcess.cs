@@ -1,6 +1,8 @@
 ﻿using Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebServices.DataAccess;
+using static WebServices.SharedBusiness.PrescriptionProcess;
 
 namespace WebServices.SharedBusiness
 {
@@ -168,5 +170,149 @@ namespace WebServices.SharedBusiness
             await _dbContext.SaveChangesAsync();
             return true;
         }
+        public async Task<EncounterDetailDto> GetEncounterDetailAsync(int encounterId)
+        {
+            var encounter = await _dbContext.Encounters
+                .Include(e => e.Patient)
+                .Include(e => e.Observations)
+                .Include(e => e.Conditions)
+                .Include(e => e.ClinicalNote)
+                .Include(e => e.Appointment)
+                .Include(e => e.Prescriptions)
+                    .ThenInclude(p => p.Medications)
+                        .ThenInclude(pm => pm.Medication)
+                .FirstOrDefaultAsync(e => e.Id == encounterId);
+
+            if (encounter == null)
+                throw new Exception("Encounter not found.");
+
+            var patientName = $"{encounter.Patient.LastName} {encounter.Patient.FirstName}";
+            var appointment = encounter.Appointment;
+
+            var observations = encounter.Observations.Select(o => new {
+                o.Id,
+                o.DisplayName,
+                o.ValueQuantity,
+                o.ValueString,
+                o.Unit,
+                o.EffectiveDate
+            });
+
+            var conditions = encounter.Conditions.Select(c => new {
+                c.Id,
+                c.Code, 
+                c.DisplayName,
+                c.ClinicalStatus,
+                c.RecordedDate
+            });
+
+            var notes = new[] {
+                new {
+                    encounter.ClinicalNote?.Subjective,
+                    encounter.ClinicalNote?.Objective,
+                    encounter.ClinicalNote?.Assessment,
+                    encounter.ClinicalNote?.Plan
+                }
+            };
+
+            var prescriptions = encounter.Prescriptions.Select(p => new PrescriptionDto(
+                p.Id,
+                p.IssueDate,
+                p.Medications.Select(m => new PrescriptionMedicationDto(
+                    m.Id,
+                    m.Dosage,
+                    m.Refills,
+                    new MedicationDto(
+                        m.Medication.Id,
+                        m.Medication.Name
+                    )
+                ))
+            ));
+
+            return new EncounterDetailDto(
+                 encounter.Id,
+                 patientName,
+
+                 encounter.StartTime,
+                 encounter.EndTime,
+                 encounter.Status.ToString(),
+
+                 appointment.Id,
+                 appointment.Reason,
+                 appointment.StartTime,
+                 appointment.EndTime,
+
+                 observations,
+                 conditions,
+                 notes,
+                 prescriptions
+             );
+        }
+        public async Task<bool> UpdateObservationAsync(int observationId, CreateObservationDto dto)
+        {
+            var obs = await _dbContext.ClinicalObservations
+                .FirstOrDefaultAsync(o => o.Id == observationId);
+
+            if (obs == null) return false;
+
+            obs.DisplayName = dto.DisplayName;
+            obs.ValueString = dto.ValueString;
+            obs.Unit = dto.Unit;
+            obs.Category = dto.Category;
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> UpdateConditionAsync(int encounterId, int conditionId, CreateConditionDto dto)
+        {
+            var condition = await _dbContext.Conditions
+                .FirstOrDefaultAsync(c => c.Id == conditionId && c.EncounterId == encounterId);
+
+            if (condition == null) return false;
+
+            condition.Code = dto.Code;
+            condition.DisplayName = dto.DisplayName;
+            condition.ClinicalStatus = Enum.Parse<ConditionClinicalStatus>(
+                dto.ClinicalStatus,
+                true
+            );
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> UpdatePrescriptionAsync(
+        int encounterId,
+        int prescriptionId,
+        UpdatePrescriptionDto dto)
+            {
+                var prescription = await _dbContext.DBPrescriptions
+                    .FirstOrDefaultAsync(p => p.Id == prescriptionId && p.EncounterId == encounterId);
+
+                if (prescription == null)
+                    return false;
+
+                prescription.IssueDate = dto.IssueDate;
+
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+        public async Task<bool> UpdateObservationAsync(int observationId, UpdateObservationDto dto)
+        {
+            var obs = await _dbContext.ClinicalObservations
+                .FirstOrDefaultAsync(o => o.Id == observationId);
+
+            if (obs == null) return false;
+
+            obs.Category = dto.Category ?? obs.Category;
+            obs.DisplayName = dto.DisplayName ?? obs.DisplayName;
+            obs.ValueString = dto.ValueString ?? obs.ValueString;
+            obs.Unit = dto.Unit ?? obs.Unit;
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+
     }
+
 }
