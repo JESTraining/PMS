@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule, MatDialog } from '@angu
 import { ScheduleService } from '../services/schedule/schedule.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { getPmsToken } from '../utils/storage.util';
 
 import { EncounterService } from '../services/encounter/encounter.service';
 import { EncounterModal } from '../pages/encounter-modal/encounter-modal';
@@ -257,7 +258,7 @@ export class DailyScheduleModalComponent implements OnInit {
       return;
     }
 
-    const headers = { Authorization: `Bearer ${localStorage.getItem('pms_token')}` };
+    const headers = { Authorization: `Bearer ${getPmsToken()}` };
     
     this.http.get<any[]>(`${environment.apiUrl}/api/patients/search?searchTerm=${term}`, { headers }).subscribe({
       next: (results) => this.patientSearchResults.set(results),

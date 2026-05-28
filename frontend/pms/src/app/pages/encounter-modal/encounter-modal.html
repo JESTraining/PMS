@@ -1,94 +1,311 @@
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-6">
-    <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-      <h3 class="text-lg font-semibold text-gray-800">
-        Patient {{ this.encounter.patientName }} - Encounter #{{ this.encounter.EncounterId }}
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-5xl h-[85vh] flex flex-col rounded-lg overflow-hidden">
+    
+    <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-gray-50 rounded-t-lg">
+      <h3 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+        <span>Encounter #{{ encounterId }}</span>
+        @if(summary()) {
+          <span class="text-sm px-2 py-1 bg-blue-100 text-blue-800 rounded-full">{{ summary()?.status }}</span>
+        }
       </h3>
-      <button
-        (click)="onClose()"
-        class="text-gray-500 hover:text-gray-700 text-xl"
-        aria-label="Close"
-      >
-        ×
-      </button>
+      <button (click)="closeModal()" class="text-gray-500 hover:text-red-500 text-2xl" aria-label="Close">&times;</button>
     </div>
 
-    <div class="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-      <h4 class="text-sm text-gray-600">
-        Encounter Reason: {{ this.encounter.encounterReason }}
-      </h4>
-    </div>
+    @if (isLoading()) {
+      <div class="flex-1 flex justify-center items-center">
+        <p class="text-gray-500">Loading encounter data...</p>
+      </div>
+    } @else if (summary()) {
+      
+      <div class="border-b border-gray-200 bg-white px-6 pt-2 flex overflow-x-auto">
+        <button (click)="setTab('summary')" [class.border-blue-500]="activeTab() === 'summary'" [class.text-blue-600]="activeTab() === 'summary'" class="px-4 py-2 border-b-2 border-transparent font-medium text-gray-600 hover:text-blue-500 transition whitespace-nowrap">Summary</button>
+        <button (click)="setTab('notes')" [class.border-blue-500]="activeTab() === 'notes'" [class.text-blue-600]="activeTab() === 'notes'" class="px-4 py-2 border-b-2 border-transparent font-medium text-gray-600 hover:text-blue-500 transition whitespace-nowrap">Clinical Notes</button>
+        <button (click)="setTab('observations')" [class.border-blue-500]="activeTab() === 'observations'" [class.text-blue-600]="activeTab() === 'observations'" class="px-4 py-2 border-b-2 border-transparent font-medium text-gray-600 hover:text-blue-500 transition whitespace-nowrap">Observations ({{summary()?.observationsCount}})</button>
+        <button (click)="setTab('conditions')" [class.border-blue-500]="activeTab() === 'conditions'" [class.text-blue-600]="activeTab() === 'conditions'" class="px-4 py-2 border-b-2 border-transparent font-medium text-gray-600 hover:text-blue-500 transition whitespace-nowrap">Conditions ({{summary()?.conditionsCount}})</button>
+        <button (click)="setTab('allergies')" [class.border-blue-500]="activeTab() === 'allergies'" [class.text-blue-600]="activeTab() === 'allergies'" class="px-4 py-2 border-b-2 border-transparent font-medium text-gray-600 hover:text-blue-500 transition whitespace-nowrap">Allergies ({{summary()?.allergiesCount}})</button>
+        <button (click)="setTab('procedures')" [class.border-blue-500]="activeTab() === 'procedures'" [class.text-blue-600]="activeTab() === 'procedures'" class="px-4 py-2 border-b-2 border-transparent font-medium text-gray-600 hover:text-blue-500 transition whitespace-nowrap">Procedures ({{summary()?.proceduresCount}})</button>
+      </div>
 
-    <div class="px-6 py-4">
-      @if (errorMessage()) {
-        <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-          {{ errorMessage() }}
-        </div>
-      }
+      <div class="px-6 pt-4">
+        @if (errorMessage()) { <div class="p-3 bg-red-100 text-red-700 rounded-md mb-2">{{ errorMessage() }}</div> }
+        @if (successMessage()) { <div class="p-3 bg-green-100 text-green-700 rounded-md mb-2">{{ successMessage() }}</div> }
+      </div>
 
-      <form (ngSubmit)="onSave()" class="space-y-4">
-        <div>
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Diagnosis</mat-label>
-            <textarea
-              id="ClinicalNotes"
-              [(ngModel)]="formData().ClinicalNotes"
-              [value]="formData().ClinicalNotes"
-              (change)="updateFormField('ClinicalNotes', $any($event.target).value)"
-              placeholder="Enter diagnosis"
-              class="w-full"
-              required
-            ></textarea>
-          </mat-form-field>
-        </div>
+      <div class="flex-1 overflow-y-auto px-6 py-4 bg-gray-50">
 
-        <div>
-          <mat-form-field appearance="fill" class="w-full">
-            <mat-label>Alergies</mat-label>
-            <textarea
-              id="Alergies"
-              [(ngModel)]="formData().Alergies"
-              [value]="formData().Alergies"
-              (change)="updateFormField('Alergies', $any($event.target).value)"
-              placeholder="Enter allergies"
-              class="w-full"
-              required
-            ></textarea>
-          </mat-form-field>
-        </div>
+       @if (activeTab() === 'summary') {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+              <h4 class="font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/O/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-blue-600">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                </svg>
+                General Information
+              </h4>
+              
+              <div class="space-y-4">
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="col-span-1 text-sm font-medium text-gray-500">Patient</div>
+                  <div class="col-span-2 text-sm font-semibold text-gray-900">{{ summary()?.patientName }}</div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="col-span-1 text-sm font-medium text-gray-500">Attending Dr.</div>
+                  <div class="col-span-2 text-sm font-semibold text-gray-900 text-blue-700">Dr. {{ summary()?.doctorName }}</div>
+                </div>
 
-        <div>
-          <label for="Prescription" class="block text-sm font-medium text-gray-700 mb-1">
-            Prescription <span class="text-red-500">*</span>
-          </label>
-          <textarea
-            id="Prescription"
-            [(ngModel)]="formData().Prescription"
-            name="Prescription"
-            (change)="updateFormField('Prescription', $any($event.target).value)"
-            placeholder="Enter prescription details"
-            rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-            required
-          ></textarea>
-        </div>
-      </form>
-    </div>
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="col-span-1 text-sm font-medium text-gray-500">Assisting Nurse</div>
+                  <div class="col-span-2 text-sm font-medium text-gray-400 italic">Not Assigned (Mock)</div>
+                </div>
 
-    <div class="border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
-      <button
-        (click)="onClose()"
-        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition font-medium"
-      >
-        Cancel
-      </button>
-      <button
-        (click)="onSave()"
-        [disabled]="isSaving()"
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {{ isSaving() ? 'Saving...' : 'Save Encounter' }}
-      </button>
-    </div>
+                <div class="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100">
+                  <div class="col-span-1 text-sm font-medium text-gray-500">Encounter ID</div>
+                  <div class="col-span-2 text-sm font-semibold text-gray-900">#{{ summary()?.id }}</div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="col-span-1 text-sm font-medium text-gray-500">Status</div>
+                  <div class="col-span-2 text-sm font-semibold">
+                    <span class="px-2 py-1 bg-gray-100 rounded-md text-gray-700">{{ summary()?.status }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-2 mt-6 p-3 rounded-md transition-colors" 
+                   [ngClass]="isNoteCompleted() ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'">
+                <span class="flex h-3 w-3 rounded-full" [ngClass]="isNoteCompleted() ? 'bg-green-500' : 'bg-yellow-500'"></span>
+                <span class="text-sm font-medium" [ngClass]="isNoteCompleted() ? 'text-green-700' : 'text-yellow-700'">
+                  {{ isNoteCompleted() ? 'Clinical Note (SOAP): Completed' : 'Clinical Note (SOAP): Incomplete' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+              <h4 class="font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/O/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-blue-600">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                </svg>
+                Clinical Records Summary
+              </h4>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex flex-col items-center justify-center">
+                  <span class="text-2xl font-bold text-gray-800">{{ summary()?.observationsCount }}</span>
+                  <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold mt-1">Observations</span>
+                </div>
+                
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex flex-col items-center justify-center">
+                  <span class="text-2xl font-bold text-gray-800">{{ summary()?.conditionsCount }}</span>
+                  <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold mt-1">Conditions</span>
+                </div>
+                
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex flex-col items-center justify-center">
+                  <span class="text-2xl font-bold text-gray-800">{{ summary()?.allergiesCount }}</span>
+                  <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold mt-1">Allergies</span>
+                </div>
+                
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex flex-col items-center justify-center">
+                  <span class="text-2xl font-bold text-gray-800">{{ summary()?.proceduresCount }}</span>
+                  <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold mt-1">Procedures</span>
+                </div>
+              </div>
+              
+              <div class="mt-4 bg-blue-50 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
+                <span class="text-sm font-medium text-blue-800">Prescriptions Issued</span>
+                <span class="text-lg font-bold text-blue-900 bg-white px-3 py-1 rounded-md shadow-sm">{{ summary()?.prescriptionsCount }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-end">
+            <button *ngIf="summary()?.status !== 'Cancelled'" 
+              (click)="invalidateEncounter()" 
+              class="px-6 py-2 bg-red-50 text-red-600 border border-red-200 rounded hover:bg-red-100 font-medium">
+              Invalidate Encounter
+            </button>
+             <button *ngIf="summary()?.status !== 'Completed' && summary()?.status !== 'Cancelled'" 
+                     (click)="completeEncounter()" 
+                     class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-medium shadow-sm transition">
+                Finish & Complete Encounter
+             </button>
+          </div>
+        }
+
+        @if (activeTab() === 'notes') {
+          <div class="bg-white p-4 rounded shadow-sm border border-gray-200 space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+              <h4 class="font-semibold text-gray-700">Clinical Narrative (SOAP Note)</h4>
+              <button (click)="toggleEditNote()" 
+                      class="text-sm px-3 py-1 rounded border transition"
+                      [ngClass]="isEditingNote() ? 'bg-gray-100 text-gray-600 border-gray-300' : 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100'">
+                {{ isEditingNote() ? 'Cancel Editing' : 'Edit Note' }}
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-4">
+              <div>
+                <label class="block text-sm font-medium" [ngClass]="isEditingNote() ? 'text-blue-700' : 'text-gray-500'">Subjective (Patient's History)</label>
+                <textarea rows="3" [(ngModel)]="noteForm().subjective" [disabled]="!isEditingNote()"
+                          class="mt-1 w-full p-2 border rounded transition-colors"
+                          [ngClass]="!isEditingNote() ? 'bg-gray-50 border-gray-200 text-gray-600' : 'bg-white border-blue-300 focus:ring-1 focus:ring-blue-500'"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium" [ngClass]="isEditingNote() ? 'text-blue-700' : 'text-gray-500'">Objective (Physical Exam/Vitals)</label>
+                <textarea rows="3" [(ngModel)]="noteForm().objective" [disabled]="!isEditingNote()"
+                          class="mt-1 w-full p-2 border rounded transition-colors"
+                          [ngClass]="!isEditingNote() ? 'bg-gray-50 border-gray-200 text-gray-600' : 'bg-white border-blue-300 focus:ring-1 focus:ring-blue-500'"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium" [ngClass]="isEditingNote() ? 'text-blue-700' : 'text-gray-500'">Assessment (Diagnosis)</label>
+                <textarea rows="3" [(ngModel)]="noteForm().assessment" [disabled]="!isEditingNote()"
+                          class="mt-1 w-full p-2 border rounded transition-colors"
+                          [ngClass]="!isEditingNote() ? 'bg-gray-50 border-gray-200 text-gray-600' : 'bg-white border-blue-300 focus:ring-1 focus:ring-blue-500'"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium" [ngClass]="isEditingNote() ? 'text-blue-700' : 'text-gray-500'">Plan (Treatment/Follow-up)</label>
+                <textarea rows="3" [(ngModel)]="noteForm().plan" [disabled]="!isEditingNote()"
+                          class="mt-1 w-full p-2 border rounded transition-colors"
+                          [ngClass]="!isEditingNote() ? 'bg-gray-50 border-gray-200 text-gray-600' : 'bg-white border-blue-300 focus:ring-1 focus:ring-blue-500'"></textarea>
+              </div>
+            </div>
+            
+            @if (isEditingNote()) {
+              <div class="flex justify-end pt-2">
+                <button (click)="saveNotes()" [disabled]="isSaving()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 shadow-sm disabled:opacity-50">
+                  {{ isSaving() ? 'Saving...' : 'Save Clinical Note' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        @if (activeTab() === 'observations') {
+          <div class="grid grid-cols-3 gap-6">
+            <div class="col-span-1 bg-white p-4 rounded shadow-sm border border-gray-200 h-fit">
+              <h4 class="font-semibold text-gray-700 mb-4 border-b pb-2">Add Observation</h4>
+              <input type="text" [(ngModel)]="observationForm().category" placeholder="Category (e.g., vital-signs)" class="w-full mb-3 p-2 border rounded">
+              <input type="text" [(ngModel)]="observationForm().displayName" placeholder="Name (e.g., Blood Pressure)" class="w-full mb-3 p-2 border rounded">
+              <input type="text" [(ngModel)]="observationForm().valueString" placeholder="Value (e.g., 120/80)" class="w-full mb-3 p-2 border rounded">
+              <input type="text" [(ngModel)]="observationForm().unit" placeholder="Unit (e.g., mmHg)" class="w-full mb-4 p-2 border rounded">
+              <button (click)="addObservation()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add</button>
+            </div>
+            <div class="col-span-2 bg-white p-4 rounded shadow-sm border border-gray-200">
+              <h4 class="font-semibold text-gray-700 mb-4 border-b pb-2">Recorded Observations</h4>
+              <ul class="divide-y divide-gray-200">
+                @for (obs of summary()?.observations; track obs.id) {
+                  <li class="py-3 flex justify-between items-center">
+                    <div>
+                      <span class="font-medium text-gray-800">{{ obs.displayName }}</span>: {{ obs.valueString }} {{ obs.unit }} 
+                      <span class="text-xs text-gray-500 ml-2">({{ obs.category }})</span>
+                    </div>
+                    <button (click)="deleteObservation(obs.id)" class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                  </li>
+                } @empty {
+                  <p class="text-gray-500 text-sm">No observations recorded yet.</p>
+                }
+              </ul>
+            </div>
+          </div>
+        }
+
+        @if (activeTab() === 'conditions') {
+          <div class="grid grid-cols-3 gap-6">
+            <div class="col-span-1 bg-white p-4 rounded shadow-sm border border-gray-200 h-fit">
+              <h4 class="font-semibold text-gray-700 mb-4 border-b pb-2">Add Condition</h4>
+              <input type="text" [(ngModel)]="conditionForm().code" placeholder="Code (e.g., E11.9)" class="w-full mb-3 p-2 border rounded">
+              <input type="text" [(ngModel)]="conditionForm().displayName" placeholder="Condition Name" class="w-full mb-3 p-2 border rounded">
+              <select [(ngModel)]="conditionForm().clinicalStatus" class="w-full mb-4 p-2 border rounded bg-white">
+                <option value="Active">Active</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+              <button (click)="addCondition()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add</button>
+            </div>
+            <div class="col-span-2 bg-white p-4 rounded shadow-sm border border-gray-200">
+              <h4 class="font-semibold text-gray-700 mb-4 border-b pb-2">Recorded Conditions</h4>
+              <ul class="divide-y divide-gray-200">
+                @for (cond of summary()?.conditions; track cond.id) {
+                  <li class="py-3 flex justify-between items-center">
+                    <div>
+                      <span class="font-medium text-gray-800">{{ cond.displayName }}</span> ({{ cond.code }})
+                      <span class="text-xs ml-2 px-2 py-1 bg-gray-100 rounded">{{ cond.clinicalStatus }}</span>
+                    </div>
+                    <button (click)="deleteCondition(cond.id)" class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                  </li>
+                } @empty {
+                  <p class="text-gray-500 text-sm">No conditions recorded yet.</p>
+                }
+              </ul>
+            </div>
+          </div>
+        }
+
+        @if (activeTab() === 'allergies') {
+          <div class="grid grid-cols-3 gap-6">
+            <div class="col-span-1 bg-white p-4 rounded shadow-sm border border-gray-200 h-fit">
+              <h4 class="font-semibold text-gray-700 mb-4 border-b pb-2">Add Allergy</h4>
+              <input type="text" [(ngModel)]="allergyForm().substance" placeholder="Substance (e.g., Penicillin)" class="w-full mb-3 p-2 border rounded">
+              <input type="text" [(ngModel)]="allergyForm().reaction" placeholder="Reaction (e.g., Hives)" class="w-full mb-3 p-2 border rounded">
+              <select [(ngModel)]="allergyForm().criticality" class="w-full mb-4 p-2 border rounded bg-white">
+                <option value="Low">Low</option>
+                <option value="High">High</option>
+                <option value="UnableToAssess">Unable To Assess</option>
+              </select>
+              <button (click)="addAllergy()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add</button>
+            </div>
+            <div class="col-span-2 bg-white p-4 rounded shadow-sm border border-gray-200">
+              <h4 class="font-semibold text-gray-700 mb-4 border-b pb-2">Recorded Allergies</h4>
+              <ul class="divide-y divide-gray-200">
+                @for (allg of summary()?.allergies; track allg.id) {
+                  <li class="py-3 flex justify-between items-center">
+                    <div>
+                      <span class="font-medium text-gray-800">{{ allg.substance }}</span> - Reaction: {{ allg.reaction }}
+                      <span class="text-xs ml-2 px-2 py-1 bg-red-50 text-red-700 rounded">{{ allg.criticality }} Risk</span>
+                    </div>
+                    <button (click)="deleteAllergy(allg.id)" class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                  </li>
+                } @empty {
+                  <p class="text-gray-500 text-sm">No allergies recorded yet.</p>
+                }
+              </ul>
+            </div>
+          </div>
+        }
+
+        @if (activeTab() === 'procedures') {
+          <div class="grid grid-cols-3 gap-6">
+            <div class="col-span-1 bg-white p-4 rounded shadow-sm border border-gray-200 h-fit">
+              <h4 class="font-semibold text-gray-700 mb-4 border-b pb-2">Add Procedure</h4>
+              <input type="text" [(ngModel)]="procedureForm().code" placeholder="Code (e.g., 44970)" class="w-full mb-3 p-2 border rounded">
+              <input type="text" [(ngModel)]="procedureForm().displayName" placeholder="Procedure Name" class="w-full mb-3 p-2 border rounded">
+              <select [(ngModel)]="procedureForm().status" class="w-full mb-4 p-2 border rounded bg-white">
+                <option value="Completed">Completed</option>
+                <option value="InProgress">In Progress</option>
+                <option value="Aborted">Aborted</option>
+              </select>
+              <button (click)="addProcedure()" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add</button>
+            </div>
+            <div class="col-span-2 bg-white p-4 rounded shadow-sm border border-gray-200">
+              <h4 class="font-semibold text-gray-700 mb-4 border-b pb-2">Recorded Procedures</h4>
+              <ul class="divide-y divide-gray-200">
+                @for (proc of summary()?.procedures; track proc.id) {
+                  <li class="py-3 flex justify-between items-center">
+                    <div>
+                      <span class="font-medium text-gray-800">{{ proc.displayName }}</span> ({{ proc.code }})
+                      <span class="text-xs ml-2 px-2 py-1 bg-blue-50 text-blue-700 rounded">{{ proc.status }}</span>
+                    </div>
+                    <button (click)="deleteProcedure(proc.id)" class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                  </li>
+                } @empty {
+                  <p class="text-gray-500 text-sm">No procedures recorded yet.</p>
+                }
+              </ul>
+            </div>
+          </div>
+        }
+      </div>
+    }
   </div>
 </div>

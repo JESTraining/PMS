@@ -1,0 +1,64 @@
+<div class="min-h-screen bg-gray-100 p-8">
+  <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+      <h2 class="text-2xl font-semibold text-gray-800">Patient name: {{ billing.patientName }}</h2>
+    </div>
+    <div class="flex flex-col1 md:flex-row md:items-center md:justify-between mb-8">
+      <h2 class="text-2xl font-semibold text-gray-800">Encounter Date: {{ billing.encounterDate }}</h2>
+    </div>
+
+    <div class="overflow-x-auto border border-gray-200 rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase" width="80px">#</th>
+            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase" width="220px">Code</th>
+            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Quantity</th>
+            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase" width="350px">Description</th>
+            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase" width="110px">Unit Price</th>
+            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase" width="110px">Total</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          @for (detail of billing.invoiceDetails; track detail.detailId) {
+            <tr class="hover:bg-gray-50 transition">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ detail.detailId }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ detail.code }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{{ detail.quantity }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ detail.description }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <input
+                  type="text"
+                  class="border border-gray-300 rounded-md px-2 py-1 w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  [(ngModel)]="detail.unitPrice"
+                  (ngModelChange)="onIUnitPriceChange(detail, $event)"
+                />
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">{{ detail.total | currency }}</td>
+            </tr>
+          }
+          @if (billing.invoiceDetails.length === 0) {
+            <tr>
+              <td colspan="6" class="px-6 py-12 text-center text-gray-500 italic">No details were found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
+      <button
+        (click)="onClose()"
+        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        (click)="onSave()"
+        [disabled]="isSaving()"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ isSaving() ? 'Saving...' : 'Save Invoice' }}
+      </button>
+  </div>

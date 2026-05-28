@@ -327,6 +327,53 @@ namespace WebServices.Migrations
                     b.ToTable("Encounters");
                 });
 
+            modelBuilder.Entity("Domain.Entities.EncounterLaboratories", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("DateOrdered")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("EncounterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LaboratoryStatus")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EncounterId");
+
+                    b.ToTable("EncounterLaboratories");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EncounterLaboratoriesDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("EncounterLaboratoriesId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LaboratoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EncounterLaboratoriesId");
+
+                    b.HasIndex("LaboratoryId");
+
+                    b.ToTable("EncounterLaboratoriesDetails");
+                });
+
             modelBuilder.Entity("Domain.Entities.Insurance", b =>
                 {
                     b.Property<int>("Id")
@@ -430,6 +477,9 @@ namespace WebServices.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EncounterId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("IssuedDate")
                         .HasColumnType("datetime2");
 
@@ -448,9 +498,75 @@ namespace WebServices.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EncounterId");
+
                     b.HasIndex("PatientId");
 
                     b.ToTable("DBInvoices");
+                });
+
+            modelBuilder.Entity("Domain.Entities.InvoiceDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.ToTable("InvoiceDetail");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Laboratory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LiquidIngestionBeforeExecuted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("NoFoodBeforeExecuted")
+                        .HasColumnType("bit");
+
+                    b.Property<double?>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("TimeToCompleteInHours")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Laboratories");
                 });
 
             modelBuilder.Entity("Domain.Entities.Medication", b =>
@@ -519,7 +635,7 @@ namespace WebServices.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = -1,
                             CreatedAt = new DateTime(2026, 4, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateTime(1990, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "juan@test.com",
@@ -882,6 +998,30 @@ namespace WebServices.Migrations
                     b.Navigation("Patient");
                 });
 
+            modelBuilder.Entity("Domain.Entities.EncounterLaboratories", b =>
+                {
+                    b.HasOne("Domain.Entities.Encounter", "Encounter")
+                        .WithMany("Laboratories")
+                        .HasForeignKey("EncounterId");
+
+                    b.Navigation("Encounter");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EncounterLaboratoriesDetail", b =>
+                {
+                    b.HasOne("Domain.Entities.EncounterLaboratories", "EncounterLaboratories")
+                        .WithMany("LaboratoriesDetails")
+                        .HasForeignKey("EncounterLaboratoriesId");
+
+                    b.HasOne("Domain.Entities.Laboratory", "Laboratory")
+                        .WithMany("EncounterLaboratoriesDetail")
+                        .HasForeignKey("LaboratoryId");
+
+                    b.Navigation("EncounterLaboratories");
+
+                    b.Navigation("Laboratory");
+                });
+
             modelBuilder.Entity("Domain.Entities.Insurance", b =>
                 {
                     b.HasOne("Domain.Entities.Patient", "Patient")
@@ -895,13 +1035,30 @@ namespace WebServices.Migrations
 
             modelBuilder.Entity("Domain.Entities.Invoice", b =>
                 {
+                    b.HasOne("Domain.Entities.Encounter", "Encounter")
+                        .WithMany()
+                        .HasForeignKey("EncounterId");
+
                     b.HasOne("Domain.Entities.Patient", "Patient")
                         .WithMany("Invoices")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Encounter");
+
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("Domain.Entities.InvoiceDetail", b =>
+                {
+                    b.HasOne("Domain.Entities.Invoice", "Invoice")
+                        .WithMany("InvoiceDetails")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("Domain.Entities.PrescriptionMedication", b =>
@@ -977,11 +1134,28 @@ namespace WebServices.Migrations
 
                     b.Navigation("Conditions");
 
+                    b.Navigation("Laboratories");
+
                     b.Navigation("Observations");
 
                     b.Navigation("Prescriptions");
 
                     b.Navigation("Procedures");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EncounterLaboratories", b =>
+                {
+                    b.Navigation("LaboratoriesDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Invoice", b =>
+                {
+                    b.Navigation("InvoiceDetails");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Laboratory", b =>
+                {
+                    b.Navigation("EncounterLaboratoriesDetail");
                 });
 
             modelBuilder.Entity("Domain.Entities.Patient", b =>

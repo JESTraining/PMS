@@ -76,8 +76,20 @@ namespace WebServices.DataAccess
         /// <summary>Medication prescriptions issued by a doctor to a patient.</summary>
         public DbSet<Prescriptions> DBPrescriptions { get; set; }
 
+        /// <summary>Join entity representing the many-to-many relationship between Prescriptions and Medications, including dosage and refills.</summary>
         public DbSet<PrescriptionMedication> PrescriptionMedications { get; set; }
+
+        /// <summary>Master list of medications available for prescription.</summary>
         public DbSet<Medication> Medications { get; set; }
+
+        /// <summary>Laboratory tests ordered during an encounter.</summary>
+        public DbSet<Laboratory> Laboratories { get; set; }
+
+        /// <summary>Join entity representing the relationship between an Encounter and its ordered laboratory tests, including results and interpretations.</summary>
+        public DbSet<EncounterLaboratories> EncounterLaboratories { get; set; }
+
+        /// <summary>Detailed results and interpretations for each laboratory test ordered during an encounter.</summary>
+        public DbSet<EncounterLaboratoriesDetail> EncounterLaboratoriesDetails { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -134,7 +146,7 @@ namespace WebServices.DataAccess
             modelBuilder.Entity<Patient>().HasData(
                 new Patient
                 {
-                    Id = 1,
+                    Id = -1,
                     FirstName = "Juan",
                     LastName = "Perez",
                     DateOfBirth = new DateTime(1990, 5, 10),
@@ -191,22 +203,6 @@ namespace WebServices.DataAccess
             modelBuilder.Entity<Appointment>()
                 .HasOne(p => p.Patient)
                 .WithMany(ap => ap.Appointments);
-
-            /* * LEGACY IMPLEMENTATION: DoctorRestSchedule using DateTime.
-             * This was replaced by a TimeSpan approach to support daily recurring rests 
-             * without tying them to a specific calendar day.
-             * modelBuilder.Entity<DoctorRestSchedule>()
-                .HasData(
-                new
-                {
-                    Id = 1,
-                    DoctorId = 1,
-                    StartTime = new DateTime(2026, 4, 22, 14, 0, 0), 
-                    EndTime = new DateTime(2026, 4, 22, 15, 0, 0),
-                    Reason = "Break"
-                }
-            );
-            */
 
             modelBuilder.Entity<DoctorRestSchedule>().HasKey(dr => dr.Id);
             modelBuilder.Entity<DoctorRestSchedule>().Property(dr => dr.Id).ValueGeneratedOnAdd();
@@ -280,6 +276,10 @@ namespace WebServices.DataAccess
                 .WithMany()
                 .HasForeignKey(e => e.AppointmentId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Encounter>()
+                .HasMany(e => e.Laboratories)
+                .WithOne(l => l.Encounter);
 
             // 4. Prescriptions unified configurations
             modelBuilder.Entity<Prescriptions>().HasKey(pr => pr.Id);
@@ -356,6 +356,36 @@ namespace WebServices.DataAccess
                     PrescriptionId = 1
                 }
             );
+
+            // 5. Laboratory Entity Configuration
+            modelBuilder.Entity<Laboratory>()
+                .HasKey(l => l.Id);
+
+            modelBuilder.Entity<Laboratory>()
+                .Property(l => l.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Laboratory>()
+                .HasMany(l => l.EncounterLaboratoriesDetail)
+                .WithOne(l => l.Laboratory);
+
+            modelBuilder.Entity<EncounterLaboratories>()
+                .HasKey(l => l.Id);
+
+            modelBuilder.Entity<EncounterLaboratories>()
+                .Property(l => l.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<EncounterLaboratories>()
+                .HasMany(l => l.LaboratoriesDetails)
+                .WithOne(d => d.EncounterLaboratories);
+
+            modelBuilder.Entity<EncounterLaboratoriesDetail>()
+                .HasKey(d => d.Id);
+
+            modelBuilder.Entity<EncounterLaboratoriesDetail>()
+                .Property(d => d.Id)
+                .ValueGeneratedOnAdd();
         }
     }
 }

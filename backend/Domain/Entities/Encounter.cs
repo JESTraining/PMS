@@ -59,5 +59,8 @@ namespace Domain.Entities
 
         /// <summary>The narrative clinical notes (e.g., SOAP notes) documented by the healthcare provider.</summary>
         public ClinicalNote? ClinicalNote { get; set; }
+
+        /// <summary>Laboratory tests ordered during the encounter, including their results and interpretations.</summary>
+        public ICollection<EncounterLaboratories>? Laboratories { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { getPmsToken } from '../../utils/storage.util';
 
 export interface ScheduleFilter {
   doctorsId: number[];
@@ -36,7 +37,7 @@ export class ScheduleService {
   private getAuthHeaders() {
     return {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     };
   }

@@ -26,7 +26,7 @@ namespace Domain.Entities
         public string DisplayName { get; set; } = string.Empty;
 
         /// <summary>The current state of the procedure.</summary>
-        public ProcedureStatus Status { get; set; } = ProcedureStatus.Completed;
+        public ProcedureStatus Status { get; set; } = ProcedureStatus.InProgress;
 
         /// <summary>The date and time when the procedure was executed.</summary>
         public DateTime PerformedDate { get; set; } = DateTime.UtcNow;

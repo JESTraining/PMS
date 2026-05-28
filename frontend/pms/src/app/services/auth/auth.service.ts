@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { getPmsToken } from '../../utils/storage.util';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -62,6 +63,6 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('pms_token');
+    return !!getPmsToken();
   }
 }

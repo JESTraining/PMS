@@ -16,18 +16,29 @@
         public string PatientName { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the doctor's name.
+        /// </summary>
+        /// <remarks>Never null; initialized to an empty string.</remarks>
+        public string DoctorName { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets or sets the start time for the associated event or operation.
         /// </summary>
-        public TimeOnly StartTime { get; set; }
+        public DateTime StartTime { get; set; }
 
         /// <summary>
         /// Gets or sets the end time for the associated event or operation.
         /// </summary>
-        public TimeOnly EndTime { get; set; }
+        public DateTime? EndTime { get; set; }
 
         /// <summary>
         /// Gets or sets the reason for the encounter, providing context for the event or operation.
         /// </summary>
         public string EncounterReason { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the current status for the encounter.
+        /// </summary>
+        public string? Status { get; set; }
     }
 }

@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/.vs
-/Domain/bin
-/Domain/obj
-/Tests/bin
-/Test/obj
-/WebServices/bin
-/WebServices/obj
-=======
 ############################################
 # Visual Studio / Visual Studio Code
 ############################################
@@ -101,4 +88,3 @@ TestResults/
 ############################################
 logs/
 *.log
->>>>>>> 71640ea383513b1926a64c80814fab6f704d1d35

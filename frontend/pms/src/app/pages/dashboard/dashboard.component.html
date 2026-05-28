@@ -1,0 +1,299 @@
+<div class="dash w-full">
+  <!-- Toolbar: breadcrumbs + actions (Cliniva-style) -->
+  <div class="dash-toolbar">
+    <nav class="dash-breadcrumb" aria-label="Breadcrumb">
+      <span class="text-gray-500">Dashboard</span>
+      <span class="dash-bc-sep">›</span>
+      <a routerLink="/dashboard" class="dash-bc-link">
+        <span class="material-icons text-base align-middle">home</span>
+      </a>
+      <span class="dash-bc-sep">›</span>
+      <span class="text-gray-800 font-medium">Main</span>
+    </nav>
+    <div class="dash-actions">
+      <a routerLink="/patients" class="dash-btn dash-btn-primary">
+        <span class="material-icons text-lg">person_add</span>
+        Add Patient
+      </a>
+      <a routerLink="/schedule" class="dash-btn dash-btn-outline">
+        <span class="material-icons text-lg">event</span>
+        Appointment
+      </a>
+    </div>
+  </div>
+
+  <header class="dash-header">
+    <h1 class="dash-title">Welcome back, {{ userName }}</h1>
+    <p class="dash-subtitle">Here is a quick overview of your practice.</p>
+  </header>
+
+  <!-- KPI row -->
+  <section class="dash-kpi-grid" aria-label="Summary statistics">
+    <article class="dash-card dash-kpi">
+      <div class="dash-kpi-top">
+        <div class="dash-kpi-icon bg-violet-100 text-violet-600">
+          <span class="material-icons">event_available</span>
+        </div>
+        <div class="dash-kpi-text">
+          <p class="dash-kpi-label">Appointments</p>
+          <p class="dash-kpi-value text-gray-900">{{ summary()?.totalAppointments || 0 }}</p>
+        </div>
+      </div>
+      @if (chartsReady()) {
+        <apx-chart
+          [series]="sparkAppointments"
+          [chart]="sparkChartBase"
+          [stroke]="sparkStroke"
+          [fill]="sparkFillPurple"
+          [colors]="sparkColorsPurple"
+          [dataLabels]="sparkDataLabels"
+          [tooltip]="sparkTooltipAppointments"
+          [xaxis]="sparkXaxis"
+          [markers]="sparkMarkers"
+        />
+      } @else {
+        <div class="dash-chart-ph" aria-hidden="true"></div>
+      }
+    </article>
+
+    <article class="dash-card dash-kpi">
+      <div class="dash-kpi-top">
+        <div class="dash-kpi-icon bg-orange-100 text-orange-600">
+          <span class="material-icons">content_cut</span>
+        </div>
+        <div class="dash-kpi-text">
+          <p class="dash-kpi-label">Encounters</p>
+          <p class="dash-kpi-value text-gray-900">{{ summary()?.totalEncounters || 0 }}</p>
+        </div>
+      </div>
+      @if (chartsReady()) {
+        <apx-chart
+          [series]="sparkOperations"
+          [chart]="sparkChartBase"
+          [stroke]="sparkStroke"
+          [fill]="sparkFillOrange"
+          [colors]="sparkColorsOrange"
+          [dataLabels]="sparkDataLabels"
+          [tooltip]="sparkTooltipEncounters"
+          [xaxis]="sparkXaxis"
+          [markers]="sparkMarkers"
+        />
+      } @else {
+        <div class="dash-chart-ph" aria-hidden="true"></div>
+      }
+    </article>
+
+    <article class="dash-card dash-kpi">
+      <div class="dash-kpi-top">
+        <div class="dash-kpi-icon bg-green-100 text-green-600">
+          <span class="material-icons">person_add_alt_1</span>
+        </div>
+        <div class="dash-kpi-text">
+          <p class="dash-kpi-label">New Patients</p>
+          <p class="dash-kpi-value text-gray-900">{{ summary()?.newPatients || 0 }}</p>
+        </div>
+      </div>
+      @if (chartsReady()) {
+        <apx-chart
+          [series]="sparkPatients"
+          [chart]="sparkChartBase"
+          [stroke]="sparkStroke"
+          [fill]="sparkFillGreen"
+          [colors]="sparkColorsGreen"
+          [dataLabels]="sparkDataLabels"
+          [tooltip]="sparkTooltipPatients"
+          [xaxis]="sparkXaxis"
+          [markers]="sparkMarkers"
+        />
+      } @else {
+        <div class="dash-chart-ph" aria-hidden="true"></div>
+      }
+    </article>
+
+    <article class="dash-card dash-kpi">
+      <div class="dash-kpi-top">
+        <div class="dash-kpi-icon bg-blue-100 text-blue-600">
+          <span class="material-icons">payments</span>
+        </div>
+        <div class="dash-kpi-text">
+          <p class="dash-kpi-label">Earning</p>
+          <p class="dash-kpi-value text-gray-900">{{ (summary()?.totalEarnings || 0) | currency }}</p>
+        </div>
+      </div>
+      @if (chartsReady()) {
+        <apx-chart
+          [series]="sparkEarning"
+          [chart]="sparkChartBase"
+          [stroke]="sparkStroke"
+          [fill]="sparkFillBlue"
+          [colors]="sparkColorsBlue"
+          [dataLabels]="sparkDataLabels"
+          [tooltip]="sparkTooltipEarning"
+          [xaxis]="sparkXaxis"
+          [markers]="sparkMarkers"
+        />
+      } @else {
+        <div class="dash-chart-ph" aria-hidden="true"></div>
+      }
+    </article>
+  </section>
+
+  <!-- Middle row: patient chart | appointments | calendar -->
+  <section class="dash-mid-grid">
+    <article class="dash-card dash-mid-card">
+      <div class="dash-card-head">
+        <h2 class="dash-card-title">Patient Conditions Chart</h2>
+        <div class="dash-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="chartTab() === 'daily'"
+            class="dash-tab"
+            [class.dash-tab-active]="chartTab() === 'daily'"
+            (click)="setChartTab('daily')"
+          >
+            Daily
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="chartTab() === 'weekly'"
+            class="dash-tab"
+            [class.dash-tab-active]="chartTab() === 'weekly'"
+            (click)="setChartTab('weekly')"
+          >
+            Weekly
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="chartTab() === 'monthly'"
+            class="dash-tab"
+            [class.dash-tab-active]="chartTab() === 'monthly'"
+            (click)="setChartTab('monthly')"
+          >
+            Monthly
+          </button>
+        </div>
+      </div>
+      @if (chartsReady()) {
+        <apx-chart
+          [series]="patientSeries"
+          [chart]="patientChart"
+          [labels]="patientLabels"
+          [colors]="patientColors"
+          [plotOptions]="patientPlot"
+          [legend]="patientLegend"
+          [dataLabels]="patientDataLabels"
+        />
+      } @else {
+        <div class="dash-chart-ph-lg" aria-hidden="true"></div>
+      }
+    </article>
+
+    <article class="dash-card dash-mid-card">
+      <div class="dash-card-head">
+        <h2 class="dash-card-title">Appointments</h2>
+        <span class="dash-card-meta">May 2026</span>
+      </div>
+      <div class="dash-date-strip">
+        @for (d of appointmentDays(); track d.day) {
+          <button
+            type="button"
+            class="dash-date-cell transition-all hover:bg-violet-50 hover:border-violet-300 cursor-pointer"
+            [class.dash-date-cell-active]="d.active"
+            (click)="onSelectDay(d.day)">
+            <span class="dash-date-dow">{{ d.dow }}</span>
+            <span class="dash-date-num">{{ d.day }}</span>
+          </button>
+        }
+</div>
+      <ul class="dash-appt-list">
+        @for (a of appointmentsList(); track a.time) {
+          <li class="dash-appt-row">
+            <div class="dash-appt-avatar">{{ a.patientName.charAt(0) }}</div>
+            <div class="dash-appt-main">
+              <p class="dash-appt-name">{{ a.patientName }}</p>
+              <p class="dash-appt-meta">{{ a.type }} · {{ a.doctorName }}</p>
+            </div>
+            <span class="dash-appt-time">{{ a.time }}</span>
+          </li>
+        }
+        @if (appointmentsList().length === 0) {
+          <li class="text-sm text-gray-500 text-center py-4">No appointments scheduled for the selected day.</li>
+        }
+      </ul>
+    </article>
+
+    <article class="dash-card dash-mid-card dash-cal-card">
+      <div class="dash-card-head">
+        <h2 class="dash-card-title">{{ currentMonthName }}</h2>
+      </div>
+      <div class="dash-cal-legend">
+        <span><i class="dot dot-b"></i> Scheduled</span>
+        <span><i class="dot dot-g"></i> Completed</span>
+      </div>
+      <div class="dash-cal-grid">
+        <span class="dash-cal-dow">Su</span><span class="dash-cal-dow">Mo</span><span class="dash-cal-dow">Tu</span>
+        <span class="dash-cal-dow">We</span><span class="dash-cal-dow">Th</span><span class="dash-cal-dow">Fr</span><span class="dash-cal-dow">Sa</span>
+        
+        @for (item of flatCalendarCells; track item.id) {
+          @if (item.cell === null) {
+            <span class="dash-cal-cell dash-cal-empty"></span>
+          } @else {
+            <span class="dash-cal-cell" [class.dash-cal-today]="isToday(item.cell)">
+              {{ item.cell }}
+              
+              @if (getDayData(item.cell); as dayData) {
+                <span class="dash-cal-dots">
+                  @if (dayData.hasScheduled) { <i class="dot dot-b"></i> }
+                  @if (dayData.hasCompleted) { <i class="dot dot-g"></i> }
+                </span>
+              }
+            </span>
+          }
+        }
+      </div>
+    </article>
+  </section>
+
+  <!-- Bottom row -->
+  <section class="dash-bot-grid">
+    <article class="dash-card dash-bot-wide">
+      <div class="dash-card-head">
+        <h2 class="dash-card-title">Hospital Survey</h2>
+        <span class="dash-pill">Monthly</span>
+      </div>
+      @if (chartsReady()) {
+        <apx-chart
+          [series]="surveySeries"
+          [chart]="surveyChart"
+          [stroke]="surveyStroke"
+          [colors]="surveyColors"
+          [xaxis]="surveyXaxis"
+          [grid]="surveyGrid"
+          [legend]="surveyLegend"
+          [tooltip]="surveyTooltip"
+          [dataLabels]="sparkDataLabels"
+        />
+      } @else {
+        <div class="dash-chart-ph-xl" aria-hidden="true"></div>
+      }
+    </article>
+
+    <article class="dash-card dash-bot-side">
+      <h2 class="dash-card-title mb-1">Total Appointments</h2>
+      <p class="dash-big-num">{{ summary()?.totalAppointments || 0 }}</p>
+      <div class="dash-stat-blocks">
+        <div class="dash-stat-block bg-blue-50 border border-blue-100">
+          <span class="text-sm text-blue-800 font-medium">{{ summary()?.completedAppointments || 0 }}</span>
+          <span class="text-xs text-blue-600/80">Completed</span>
+        </div>
+        <div class="dash-stat-block bg-orange-50 border border-orange-100">
+          <span class="text-sm text-orange-800 font-medium">{{ summary()?.upcomingAppointments || 0 }}</span>
+          <span class="text-xs text-orange-600/80">Upcoming</span>
+        </div>
+      </div>
+    </article>
+  </section>
+</div>

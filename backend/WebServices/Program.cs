@@ -23,6 +23,10 @@ builder.Services.AddScoped<AuthenticationProcess>();
 builder.Services.AddScoped<ScheduleProcess>();
 builder.Services.AddScoped<EncounterProcess>();
 
+// Adding Analytics services
+builder.Services.AddScoped<WebServices.Repositories.Analytics.AnalyticsRepository>();
+builder.Services.AddScoped<WebServices.SharedBusiness.Analytics.AnalyticsProcess>();
+
 // Adding in-memory for temporary caching needs. In this case used for storing JTI values for token revocation. This can be replaced with a persistent caching solution if needed in the future.
 builder.Services.AddMemoryCache();
 
@@ -44,7 +48,7 @@ builder.Services.AddOpenApi();
 
 // Configuring DBContext for SQL Server
 var connectionString = builder.Configuration.GetConnectionString("PMSDbConn");
-
+ 
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(connectionString));
 

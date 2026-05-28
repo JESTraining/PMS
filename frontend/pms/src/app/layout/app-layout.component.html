@@ -1,0 +1,182 @@
+<div class="layout-root">
+  <aside
+    class="layout-aside"
+    [class.layout-aside--collapsed]="sidebarCollapsed()"
+    aria-label="Main navigation"
+  >
+    <!-- Brand -->
+    <div class="layout-aside-brand">
+      <div class="layout-logo">
+        <span class="layout-logo-mark material-icons" aria-hidden="true">local_hospital</span>
+        @if (!sidebarCollapsed()) {
+          <div class="layout-logo-text">
+            <span class="layout-logo-title">PMS</span>
+            <span class="layout-logo-sub">Admin</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- User profile (Cliniva-style, top of sidebar) -->
+    <div class="layout-aside-user">
+      <div class="layout-user-avatar" [attr.aria-label]="userName || user">
+        {{ userInitial }}
+      </div>
+      @if (!sidebarCollapsed()) {
+        <div class="layout-user-text">
+          <p class="layout-user-name">{{ userName || 'User' }}</p>
+          <p class="layout-user-role">{{ (user || 'staff') | uppercase }}</p>
+        </div>
+      }
+    </div>
+
+    <nav class="layout-nav">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="layout-nav-link--active"
+        class="layout-nav-link"
+        [title]="sidebarCollapsed() ? 'Dashboard' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">dashboard</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Dashboard</span>
+        }
+      </a>
+
+      <a
+        routerLink="/users"
+        routerLinkActive="layout-nav-link--active"
+        class="layout-nav-link"
+        [title]="sidebarCollapsed() ? 'Users Management' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">group</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Users Management</span>
+        }
+      </a>
+
+      <a
+        routerLink="/patients"
+        routerLinkActive="layout-nav-link--active"
+        class="layout-nav-link"
+        [title]="sidebarCollapsed() ? 'Patients Management' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">personal_injury</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Patients Management</span>
+        }
+      </a>
+
+      <a
+        routerLink="/schedule"
+        routerLinkActive="layout-nav-link--active"
+        class="layout-nav-link"
+        [title]="sidebarCollapsed() ? 'Schedule' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">calendar_month</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Schedule</span>
+        }
+      </a>
+
+      <a
+        routerLink="/doctor-rest-time"
+        routerLinkActive="layout-nav-link--active"
+        class="layout-nav-link"
+        [title]="sidebarCollapsed() ? 'Doctor Rest Time' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">hotel_class</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Doctor Rest Time</span>
+        }
+      </a>
+
+      <a
+        routerLink="/encounters"
+        routerLinkActive="layout-nav-link--active"
+        class="layout-nav-link"
+        [title]="sidebarCollapsed() ? 'Encounters' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">medical_services</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Encounters</span>
+        }
+      </a>
+
+      <a
+        routerLink="/prescriptions"
+        routerLinkActive="layout-nav-link--active"
+        class="layout-nav-link"
+        [title]="sidebarCollapsed() ? 'Prescriptions' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">medication</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Prescriptions</span>
+        }
+      </a>
+
+      <a
+        routerLink="/billing"
+        routerLinkActive="layout-nav-link--active"
+        class="layout-nav-link"
+        [title]="sidebarCollapsed() ? 'Billing' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">receipt_long</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Billing</span>
+        }
+      </a>
+    </nav>
+
+    <div class="layout-aside-footer">
+      <button
+        type="button"
+        class="layout-collapse-btn"
+        (click)="toggleSidebar()"
+        [attr.aria-expanded]="!sidebarCollapsed()"
+        [attr.aria-label]="sidebarCollapsed() ? 'Expand menu' : 'Collapse menu'"
+      >
+        <span class="material-icons" aria-hidden="true">
+          {{ sidebarCollapsed() ? 'chevron_right' : 'chevron_left' }}
+        </span>
+      </button>
+      <button
+        type="button"
+        class="layout-logout-btn"
+        (click)="onLogout()"
+        [title]="sidebarCollapsed() ? 'Log out' : ''"
+      >
+        <span class="material-icons layout-nav-ico" aria-hidden="true">logout</span>
+        @if (!sidebarCollapsed()) {
+          <span class="layout-nav-label">Log out</span>
+        }
+      </button>
+    </div>
+  </aside>
+
+  <main class="layout-main">
+    <header class="layout-header">
+      <div class="layout-header-left">
+        <button
+          type="button"
+          class="layout-header-menu"
+          (click)="toggleSidebar()"
+          aria-label="Toggle sidebar"
+        >
+          <span class="material-icons">menu</span>
+        </button>
+        <h2 class="layout-header-title">Medical Management System</h2>
+      </div>
+      <div class="layout-header-user">
+        <div class="layout-header-avatar" [attr.title]="userName">
+          {{ userInitial }}
+        </div>
+        <span class="layout-header-name">{{ userName || 'User' }}</span>
+      </div>
+    </header>
+
+    <div class="layout-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -100,7 +100,7 @@ namespace WebServices.Controllers.Scheduling
         /// Creates a new medical appointment.
         /// </summary>
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<UpsertRequest>> CreateAppointment([FromBody] AppointmentRequestRecord request)
         {
             var authResult = await ValidateAuthorizationAsync();
@@ -130,7 +130,7 @@ namespace WebServices.Controllers.Scheduling
         /// Updates an existing appointment. (Pending full implementation).
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize]
+        //[Authorize]
         public ActionResult Edit(int id, [FromBody] Appointment updatedAppointment)
         {
             // JSON body should contain the updated appointment data
@@ -149,7 +149,7 @@ namespace WebServices.Controllers.Scheduling
         /// Deletes an existing appointment. (Pending full implementation).
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize]
+        //[Authorize]
         public ActionResult Delete(int id)
         {
             try
@@ -184,7 +184,7 @@ namespace WebServices.Controllers.Scheduling
                 return StatusCode(StatusCodes.Status403Forbidden, validationResult.role + " does not have permission to execute this process.");
             }
 
-            return null; // Authorization successful
+            return null;
         }
     }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Prescription } from '../../models/prescription.model';
+import { getPmsToken } from '../../utils/storage.util';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class PrescriptionService {
   getAll(): Observable<Prescription[]> {
   return this.http.get<Prescription[]>(this.apiUrl, {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+      Authorization: `Bearer ${getPmsToken()}`
     }
   });
 }
@@ -23,7 +24,7 @@ export class PrescriptionService {
   getById(id: number): Observable<Prescription> {
     return this.http.get<Prescription>(`${this.apiUrl}/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
@@ -31,7 +32,7 @@ export class PrescriptionService {
   create(data: Prescription): Observable<any> {
     return this.http.post(this.apiUrl, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
@@ -39,7 +40,7 @@ export class PrescriptionService {
   update(data: Prescription): Observable<any> {
     return this.http.put(this.apiUrl, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
@@ -47,7 +48,7 @@ export class PrescriptionService {
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }

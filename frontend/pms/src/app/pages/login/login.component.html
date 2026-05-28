@@ -1,63 +1,172 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100">
-  <div class="w-full max-w-sm bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-    
-    <h1 class="text-xl font-semibold text-gray-800 text-center mb-6">
-      PMS Login
-    </h1>
+<div class="cliniva-page">
+  <div class="cliniva-card">
+    <!-- Form column -->
+    <div class="cliniva-form-panel">
+      <h1 class="cliniva-title">Sign in</h1>
+      <p class="cliniva-subtitle">Enter your credentials to log in</p>
 
-    <form (ngSubmit)="onLogin()" class="space-y-4">
-
-      <!-- Username -->
-      <div>
-        <label
-          for="username"
-          class="block text-sm font-medium text-gray-700 mb-1"
+      <div class="role-row" aria-label="Quick role presets">
+        <button
+          type="button"
+          class="role-pill role-pill--admin"
+          [class.role-pill--inactive]="selectedRole !== null && selectedRole !== 'admin'"
+          (click)="selectRole('admin')"
         >
-          Username
-        </label>
-
-        <input
-          id="username"
-          type="text"
-          name="username"
-          [(ngModel)]="credentials.username"
-          required
-          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
-                 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-        />
+          Admin
+        </button>
+        <button
+          type="button"
+          class="role-pill role-pill--doctor"
+          [class.role-pill--inactive]="selectedRole !== null && selectedRole !== 'doctor'"
+          (click)="selectRole('doctor')"
+        >
+          Doctor
+        </button>
+        <button
+          type="button"
+          class="role-pill role-pill--patient"
+          [class.role-pill--inactive]="selectedRole !== null && selectedRole !== 'patient'"
+          (click)="selectRole('patient')"
+        >
+          Patient
+        </button>
       </div>
 
-      <!-- Password -->
-      <div>
-        <label
-          for="password"
-          class="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Password
-        </label>
+      <form (ngSubmit)="onLogin()">
+        <div class="field-wrap">
+          <input
+            id="username"
+            type="text"
+            name="username"
+            class="field-input"
+            placeholder=" "
+            [(ngModel)]="credentials.username"
+            autocomplete="username"
+            required
+          />
+          <label class="field-label" for="username">Username*</label>
+        </div>
 
-        <input
-          id="password"
-          type="password"
-          name="password"
-          [(ngModel)]="credentials.password"
-          required
-          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
-                 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-        />
+        <div class="field-wrap field-wrap--password">
+          <input
+            id="password"
+            [type]="passwordVisible ? 'text' : 'password'"
+            name="password"
+            class="field-input"
+            placeholder=" "
+            [(ngModel)]="credentials.password"
+            autocomplete="current-password"
+            required
+          />
+          <label class="field-label" for="password">Password*</label>
+          <button
+            type="button"
+            class="field-password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
+          >
+            <span class="material-icons" style="font-size: 1.25rem">
+              {{ passwordVisible ? 'visibility' : 'visibility_off' }}
+            </span>
+          </button>
+        </div>
+
+        <div class="form-row-between">
+          <label class="remember">
+            <input type="checkbox" name="remember" [(ngModel)]="rememberMe" />
+            Remember me
+          </label>
+          <a href="#" class="forgot-link" (click)="noopClick($event)">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="btn-login" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Signing in…' : 'Login' }}
+        </button>
+      </form>
+
+      <p class="footer-signup">
+        Don't have an account?
+        <a href="#" (click)="noopClick($event)">Sign up</a>
+      </p>
+
+      <div class="social-row" aria-label="Social sign in (optional)">
+        <button type="button" class="social-btn" aria-label="Google" (click)="noopClick($event)">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+            />
+          </svg>
+        </button>
+        <button type="button" class="social-btn" aria-label="Facebook" (click)="noopClick($event)">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="#1877F2"
+              d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+            />
+          </svg>
+        </button>
+        <button type="button" class="social-btn" aria-label="Apple" (click)="noopClick($event)">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"
+            />
+          </svg>
+        </button>
       </div>
+    </div>
 
-      <!-- Button -->
-      <button
-        type="submit"
-        class="w-full mt-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium
-               text-white hover:bg-blue-700 focus:outline-none focus:ring-2
-               focus:ring-blue-500 focus:ring-offset-1 transition"
-      >
-        Sign In
-      </button>
-
-    </form>
-
+    <!-- Illustration column -->
+    <div class="cliniva-art-panel" aria-hidden="true">
+      <svg class="cliniva-art-svg" viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg">
+        <!-- Sun -->
+        <path d="M 240 95 A 55 55 0 0 1 130 95 A 55 55 0 0 1 240 95 Z" fill="#fff" opacity="0.95" />
+        <!-- Birds -->
+        <path
+          d="M 70 78 Q 75 74 80 78 Q 75 80 70 78 M 95 68 Q 100 64 105 68 Q 100 70 95 68"
+          stroke="#8b7355"
+          stroke-width="2"
+          fill="none"
+          stroke-linecap="round"
+        />
+        <!-- Water -->
+        <rect x="0" y="195" width="320" height="85" fill="#e8d4a8" />
+        <path
+          d="M 0 210 Q 40 205 80 210 T 160 210 T 240 210 T 320 210 L 320 280 L 0 280 Z"
+          fill="#dcc08a"
+          opacity="0.6"
+        />
+        <!-- Boat hull -->
+        <path d="M 115 175 L 205 175 L 195 198 L 125 198 Z" fill="#2563eb" />
+        <!-- Mast & sail -->
+        <line x1="160" y1="175" x2="160" y2="95" stroke="#92400e" stroke-width="3" stroke-linecap="round" />
+        <path d="M 163 100 L 163 168 L 210 135 Z" fill="#fbbf24" />
+        <path d="M 157 105 L 157 165 L 118 132 Z" fill="#d97706" opacity="0.85" />
+        <!-- Person -->
+        <circle cx="168" cy="155" r="6" fill="#fcd34d" />
+        <path d="M 168 161 L 168 172 M 162 168 L 174 168" stroke="#1e3a5f" stroke-width="2" stroke-linecap="round" />
+        <!-- Ripples -->
+        <path
+          d="M 100 218 Q 130 212 160 218 Q 190 224 220 218"
+          stroke="#c4a574"
+          stroke-width="2"
+          fill="none"
+          opacity="0.7"
+        />
+      </svg>
+    </div>
   </div>
 </div>

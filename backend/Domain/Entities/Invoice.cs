@@ -56,6 +56,16 @@ namespace Domain.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
+        /// Encounter associated with this invoice, if applicable. This property is optional and may be null if the invoice is not linked to a specific encounter.
+        /// </summary>
+        public Encounter? Encounter { get; set; } = default!;
+
+        /// <summary>
+        /// Details of the invoice, including individual line items and their respective costs. This collection may be null if there are no details associated with the invoice.
+        /// </summary>
+        public IEnumerable<InvoiceDetail>? InvoiceDetails { get; set; } = default!;
+
+        /// <summary>
         /// Parameterless constructor required by Entity Framework Core.
         /// </summary>
         public Invoice() { }

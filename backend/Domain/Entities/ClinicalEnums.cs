@@ -59,4 +59,12 @@ namespace Domain.Entities
         Completed,
         Cancelled
     }
+
+    public enum LaboratoryStatus
+    {
+        Requested,
+        InProgress,
+        Completed,
+        Delivered,
+    }
 }

@@ -10,17 +10,17 @@ namespace WebServices.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // migrationBuilder.DropColumn(
-            //     name: "Dosage",
-            //     table: "DBPrescriptions");
+             migrationBuilder.DropColumn(
+                name: "Dosage",
+                table: "DBPrescriptions");
 
-            // migrationBuilder.DropColumn(
-            //     name: "Medication",
-            //     table: "DBPrescriptions");
+             migrationBuilder.DropColumn(
+                name: "Medication",
+                table: "DBPrescriptions");
 
-            // migrationBuilder.DropColumn(
-            //     name: "Refils",
-            //     table: "DBPrescriptions");
+             migrationBuilder.DropColumn(
+                name: "Refils",
+                table: "DBPrescriptions");
 
             migrationBuilder.CreateTable(
                 name: "PrescriptionMedications",

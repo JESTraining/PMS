@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { getPmsToken } from '../../utils/storage.util';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class RestTimeService {
   getRestTimes(): Observable<RestTimeInterface[]> {
     return this.http.get<RestTimeInterface[]>(this.apiUrl, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
@@ -22,7 +23,7 @@ export class RestTimeService {
   createRestTime(restTime: RestTimeInterface): Observable<any> {
     return this.http.post<any>(this.apiUrl, restTime, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
@@ -30,7 +31,7 @@ export class RestTimeService {
   updateRestTime(restTime: RestTimeInterface): Observable<any> {
     return this.http.put<any>(this.apiUrl, restTime, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
@@ -38,7 +39,7 @@ export class RestTimeService {
   deleteRestTime(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }

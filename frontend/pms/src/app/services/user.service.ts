@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { getPmsToken } from '../utils/storage.util';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class UserService {
   getUsers(): Observable<UserInterface[]> {
     return this.http.get<UserInterface[]>(this.apiUrl, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
@@ -21,14 +22,14 @@ export class UserService {
   createUser(user: UserInterface): Observable<any> {
     return this.http.post<boolean>(this.apiUrl, user, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
   updateUser(user: UserInterface) {
     return this.http.put(this.apiUrl, user, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
@@ -36,7 +37,7 @@ export class UserService {
   deleteUser(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('pms_token')}`
+        Authorization: `Bearer ${getPmsToken()}`
       }
     });
   }
