@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
+import { getPmsToken } from '../../utils/storage.util';
 
 @Injectable({ providedIn: 'root' })
 export class DoctorService {
@@ -9,8 +10,7 @@ export class DoctorService {
   private apiUrl = `${environment.apiUrl}/api/doctors`;
 
   private getAuthHeaders() {
-    const token = localStorage.getItem('pms_token');
-    return { headers: { Authorization: `Bearer ${token}` } };
+    return { headers: { Authorization: `Bearer ${getPmsToken()}` } };
   }
 
   getDoctors(): Observable<any[]> {

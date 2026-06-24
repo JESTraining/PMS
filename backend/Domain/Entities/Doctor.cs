@@ -15,6 +15,12 @@
         /// The full name of the doctor.
         /// </summary>
         public string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Medical specialty of the doctor (e.g. "General Medicine", "Pediatrics").
+        /// </summary>
+        public string? Specialty { get; set; }
+
         public int UserId { get; set; }
         public User User { get; set; } = null!;
 

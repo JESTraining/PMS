@@ -23,6 +23,16 @@ namespace WebServices.Controllers.Scheduling
     );
 
     /// <summary>
+    /// Represents the fields that can be updated on an existing appointment.
+    /// Provide StartTime+EndTime to reschedule, and/or Status to change state (e.g. "Cancelled").
+    /// </summary>
+    public record AppointmentUpdateRecord(
+        DateTime? StartTime,
+        DateTime? EndTime,
+        string? Status
+    );
+
+    /// <summary>
     /// API Controller responsible for managing medical appointments and doctor schedules.
     /// </summary>
     [Route("api/[controller]")]
@@ -32,6 +42,7 @@ namespace WebServices.Controllers.Scheduling
         private readonly IConfiguration _config;
         private readonly DatabaseContext _context;
         private readonly ScheduleProcess _scheduleProcess;
+        private readonly AppointmentsRepository _appointmentsRepository;
         private readonly List<string> _authorizedRoles = new List<string>
         {
             UserConstants.RoleConstants.AdminRole,
@@ -39,11 +50,16 @@ namespace WebServices.Controllers.Scheduling
             UserConstants.RoleConstants.RecepcionistRole
         };
 
-        public AppointmentsController(IConfiguration config, DatabaseContext context)
+        public AppointmentsController(
+            IConfiguration config,
+            DatabaseContext context,
+            ScheduleProcess scheduleProcess,
+            AppointmentsRepository appointmentsRepository)
         {
             _config = config;
             _context = context;
-            _scheduleProcess = new ScheduleProcess(context); // Inicializamos la capa de negocio
+            _scheduleProcess = scheduleProcess;
+            _appointmentsRepository = appointmentsRepository;
         }
 
         /// <summary>
@@ -97,10 +113,24 @@ namespace WebServices.Controllers.Scheduling
         }
 
         /// <summary>
+        /// Checks whether a proposed time slot is available for a doctor (no overlap with appointments or rest periods).
+        /// </summary>
+        [HttpGet("availability")]
+        [Authorize]
+        public async Task<ActionResult> CheckAvailability([FromQuery] int doctorId, [FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            var authResult = await ValidateAuthorizationAsync();
+            if (authResult != null) return authResult;
+
+            var (isAvailable, errorMessage) = await _scheduleProcess.IsTimeSlotAvailableAsync(doctorId, start, end);
+            return Ok(new { isAvailable, errorMessage });
+        }
+
+        /// <summary>
         /// Creates a new medical appointment.
         /// </summary>
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult<UpsertRequest>> CreateAppointment([FromBody] AppointmentRequestRecord request)
         {
             var authResult = await ValidateAuthorizationAsync();
@@ -115,8 +145,7 @@ namespace WebServices.Controllers.Scheduling
                 Patient = new Patient { Id = request.PatientId }
             };
 
-            var appointmentProcessor = new AppointmentsRepository(_context);
-            var createProcessResult = await appointmentProcessor.CreateAppointment(appointment);
+            var createProcessResult = await _appointmentsRepository.CreateAppointment(appointment);
 
             if (!createProcessResult.UpsertSuccessfull)
             {
@@ -127,22 +156,31 @@ namespace WebServices.Controllers.Scheduling
         }
 
         /// <summary>
-        /// Updates an existing appointment. (Pending full implementation).
+        /// Updates an existing appointment: reschedule (StartTime+EndTime) and/or change status (e.g. soft-cancel).
         /// </summary>
         [HttpPut("{id}")]
-        //[Authorize]
-        public ActionResult Edit(int id, [FromBody] Appointment updatedAppointment)
+        [Authorize]
+        public async Task<ActionResult> Edit(int id, [FromBody] AppointmentUpdateRecord request)
         {
-            // JSON body should contain the updated appointment data
-            try
+            var authResult = await ValidateAuthorizationAsync();
+            if (authResult != null) return authResult;
+
+            AppointmentStatus? status = null;
+            if (!string.IsNullOrWhiteSpace(request.Status))
             {
-                // TODO: Implement logic in AppointmentsRepository
-                return Ok(new { message = $"Appointment {id} updated successfully." });
+                if (!Enum.TryParse<AppointmentStatus>(request.Status, true, out var parsedStatus))
+                    return BadRequest(new { message = $"Invalid status '{request.Status}'." });
+                status = parsedStatus;
             }
-            catch (Exception ex)
+
+            var result = await _appointmentsRepository.UpdateAppointment(id, request.StartTime, request.EndTime, status);
+
+            if (!result.UpsertSuccessfull)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return BadRequest(new { message = result.Message });
             }
+
+            return Ok(result);
         }
 
         /// <summary>

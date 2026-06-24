@@ -1,0 +1,140 @@
+/* Host: overflow clip + positioning context for the corner meta overlay */
+:host {
+  overflow: hidden;
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  :host {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* ── Card header ─────────────────────────────────────────── */
+
+/* Mobile: flex row — identity left, corner meta right */
+.sch-tl-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  border-bottom: 1px solid var(--pms-border);
+}
+
+/* Desktop: block — identity takes the header height, corner meta floats */
+@media (min-width: 1024px) {
+  .sch-tl-card-head {
+    display: block;
+    /* Reserve right space so the doctor name doesn't text-flow behind the overlay */
+    padding-right: 16rem;
+    min-height: 2.75rem;
+  }
+}
+
+/* Doctor name + specialty + optional default-view hint */
+.sch-tl-head-identity {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Corner meta cluster: section tag + stat pills + date badge */
+.sch-tl-corner-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+/* On desktop: pull it out of flow and anchor to the card's top-right corner */
+@media (min-width: 1024px) {
+  .sch-tl-corner-meta {
+    position: absolute;
+    top: 0.45rem;
+    right: 0.75rem;
+  }
+}
+
+/* "Timeline" / "Next available" section chip */
+.sch-tl-corner-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--pms-muted-2);
+  background: var(--pms-canvas);
+  border: 1px solid var(--pms-border);
+  border-radius: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+}
+
+/* Stat pills */
+.sch-tl-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--pms-radius-control);
+  background: var(--pms-canvas);
+  border: 1px solid var(--pms-border);
+  line-height: 1;
+}
+
+.sch-tl-stat-n {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--pms-text-strong);
+}
+
+.sch-tl-stat-n--free { color: #16a34a; }
+
+.sch-tl-stat-cap {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pms-muted-2);
+}
+
+/* Date badge */
+.sch-tl-date-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--pms-primary);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--pms-radius-control);
+  padding: 0.25rem 0.6rem;
+  white-space: nowrap;
+}
+
+/* Default-view hint — shortened to save header height */
+.sch-tl-default-hint {
+  margin: 0.2rem 0 0;
+  font-size: 0.75rem;
+  color: var(--pms-muted-2);
+  font-style: italic;
+}
+
+/* ── Timeline scroll area ────────────────────────────────── */
+.sch-tl-scroll {
+  height: calc(100vh - 22rem);
+  min-height: 18rem;
+  overflow: auto;
+}
+
+@media (min-width: 1024px) {
+  .sch-tl-scroll {
+    height: auto;
+    flex: 1;
+    min-height: 0;
+  }
+}

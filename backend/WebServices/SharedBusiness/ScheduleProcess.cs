@@ -65,6 +65,8 @@ namespace WebServices.SharedBusiness
                 .Where(sv => filter.DoctorsId.Contains(sv.DoctorId) &&
                              (!filter.Date.HasValue || sv.Date == filter.Date.Value) &&
                              (string.IsNullOrEmpty(filter.ScheduleStatus) || sv.ScheduleStatus == filter.ScheduleStatus) &&
+                             // Hide cancelled appointments unless a specific status is requested.
+                             (!string.IsNullOrEmpty(filter.ScheduleStatus) || sv.ScheduleStatus != nameof(AppointmentStatus.Cancelled)) &&
                              (string.IsNullOrEmpty(filter.PatientName) || sv.PatientName!.Contains(filter.PatientName)))
                 .ToListAsync();
 
@@ -120,8 +122,9 @@ namespace WebServices.SharedBusiness
         /// <summary>
         /// Validates if a proposed appointment time is available for a specific doctor.
         /// It checks for overlaps with existing appointments and recurring rest schedules.
+        /// Pass <c>excludeAppointmentId</c> to ignore that appointment in the overlap check (used when rescheduling it).
         /// </summary>
-        public async Task<(bool IsAvailable, string ErrorMessage)> IsTimeSlotAvailableAsync(int doctorId, DateTime proposedStart, DateTime proposedEnd)
+        public async Task<(bool IsAvailable, string ErrorMessage)> IsTimeSlotAvailableAsync(int doctorId, DateTime proposedStart, DateTime proposedEnd, int? excludeAppointmentId = null)
         {
             if (proposedStart >= proposedEnd)
                 return (false, "Start time must be earlier than end time.");
@@ -149,7 +152,10 @@ namespace WebServices.SharedBusiness
             var proposedDate = proposedStart.Date;
 
             var overlappingAppointments = await _dbContext.DBAppointments
-                .Where(a => EF.Property<int>(a, "DoctorId") == doctorId && a.StartTime.Date == proposedDate)
+                .Where(a => a.DoctorId == doctorId
+                            && a.StartTime.Date == proposedDate
+                            && a.Status != AppointmentStatus.Cancelled
+                            && (!excludeAppointmentId.HasValue || a.Id != excludeAppointmentId.Value))
                 .ToListAsync();
 
             foreach (var app in overlappingAppointments)

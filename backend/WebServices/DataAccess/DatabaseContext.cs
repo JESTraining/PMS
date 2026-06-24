@@ -166,9 +166,12 @@ namespace WebServices.DataAccess
                 {
                     Id = 1,
                     Name = "Aurelio",
-                    UserId = -3 
+                    Specialty = "Pediatrics",
+                    UserId = -3
                 }
             );
+            modelBuilder.Entity<Doctor>().HasData(DoctorSeedData.GetDoctors());
+            modelBuilder.Entity<User>().HasData(DoctorSeedData.GetUsers());
             modelBuilder.Entity<Doctor>()
                 .HasOne(d => d.User)
                 .WithOne(u => u.Doctor)

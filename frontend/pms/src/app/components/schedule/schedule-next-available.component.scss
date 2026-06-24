@@ -1,0 +1,46 @@
+/* Host never grows — the booking panel below gets all remaining flex space */
+:host {
+  flex-shrink: 0;
+}
+
+.sch-na-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--pms-border);
+}
+
+.sch-na-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sch-na-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--pms-hairline);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.sch-na-item:last-child { border-bottom: none; }
+.sch-na-item:hover { background: #eff6ff; }
+
+.sch-na-date {
+  font-size: 0.8125rem;
+  color: var(--pms-text-strong);
+}
+
+.sch-na-time {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--pms-primary);
+  flex-shrink: 0;
+}

@@ -23,6 +23,7 @@ builder.Services.AddScoped<InvoiceProcess>();
 builder.Services.AddScoped<InsuranceProcess>();
 builder.Services.AddScoped<AuthenticationProcess>();
 builder.Services.AddScoped<ScheduleProcess>();
+builder.Services.AddScoped<WebServices.Repositories.AppointmentsRepository>();
 builder.Services.AddScoped<EncounterProcess>();
 
 builder.Services.AddScoped<IReportsRepository, ReportsRepository>();

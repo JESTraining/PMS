@@ -1,0 +1,89 @@
+/* Hidden on mobile; full card appearance on desktop */
+:host {
+  display: none;
+  align-self: start;
+}
+
+@media (min-width: 1024px) {
+  :host {
+    display: block;
+    background: var(--pms-surface);
+    border: 1px solid var(--pms-border);
+    border-left: 3px solid var(--pms-primary);
+    border-radius: var(--pms-radius-card);
+    box-shadow: var(--pms-shadow-md);
+    overflow: hidden;
+  }
+}
+
+.sch-qp-ref-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pms-text-strong);
+}
+
+.sch-qp-ref-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--pms-primary);
+  background: #eff6ff;
+  border-radius: 0.25rem;
+  padding: 0.15rem 0.45rem;
+}
+
+.sch-qp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--pms-border);
+}
+
+.sch-qp-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sch-qp-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--pms-hairline);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.sch-qp-item:last-child { border-bottom: none; }
+.sch-qp-item:hover { background: #eff6ff; }
+.sch-qp-item--active { background: #eff6ff; }
+
+.sch-qp-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--pms-text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sch-qp-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--pms-primary);
+  flex-shrink: 0;
+}
+
+.sch-qp-empty {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--pms-muted-2);
+}

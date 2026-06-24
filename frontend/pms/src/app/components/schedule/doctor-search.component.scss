@@ -1,0 +1,149 @@
+.sch-ds {
+  position: relative;
+}
+
+/* ── Selected doctor chip ────────────────────────────────── */
+.sch-ds-selected {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  border-radius: var(--pms-radius-control);
+  padding: 0.45rem 0.75rem;
+}
+
+/* Doctor avatar circle — teal to visually distinguish from patient (blue) */
+.sch-ds-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #0d9488;
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.sch-ds-selected-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.sch-ds-selected-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sch-ds-selected-specialty {
+  font-size: 0.75rem;
+  color: #3b82f6;
+}
+
+.sch-ds-selected-change {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sch-ds-selected-change:hover { color: #1d4ed8; text-decoration: underline; }
+
+/* ── Specialty filter chips ──────────────────────────────── */
+.sch-ds-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+  scrollbar-width: none;
+}
+.sch-ds-chips::-webkit-scrollbar { display: none; }
+
+/* ── Results dropdown ────────────────────────────────────── */
+.sch-ds-dropdown {
+  position: absolute;
+  z-index: 20;
+  margin-top: 0.25rem;
+  width: 100%;
+  max-height: 18rem;
+  overflow-y: auto;
+  background: var(--pms-surface);
+  border: 1px solid var(--pms-border);
+  border-radius: var(--pms-radius-control);
+  box-shadow: 0 10px 24px rgb(15 23 42 / 0.12);
+}
+
+.sch-ds-group-label {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pms-muted-2);
+  border-bottom: 1px solid var(--pms-hairline);
+  background: var(--pms-canvas);
+}
+
+.sch-ds-result {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--pms-hairline);
+  cursor: pointer;
+  color: var(--pms-text-strong);
+}
+.sch-ds-result:last-child { border-bottom: none; }
+.sch-ds-result:hover { background: #eff6ff; }
+
+/* Small avatar in dropdown rows */
+.sch-ds-result-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: #ccfbf1;
+  border: 1px solid #5eead4;
+  color: #0f766e;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.sch-ds-result-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.sch-ds-result-id {
+  font-size: 0.75rem;
+  color: var(--pms-muted-2);
+  font-weight: 400;
+}

@@ -1,0 +1,374 @@
+/* Host fills the flex slot from .sch-side-sheet */
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.sch-bp {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--pms-surface);
+  border: 1px solid var(--pms-border);
+  border-radius: var(--pms-radius-card);
+  box-shadow: var(--pms-shadow);
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.sch-bp-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--pms-border);
+  flex-shrink: 0;
+  background: var(--pms-canvas);
+}
+
+.sch-bp-head-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.sch-bp-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--pms-text-strong);
+}
+
+.sch-bp-head-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.sch-bp-doctor-label {
+  font-size: 0.75rem;
+  color: var(--pms-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sch-bp-date-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--pms-primary);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--pms-radius-control);
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+}
+
+.sch-bp-chip-icon {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+/* ── Section labels ──────────────────────────────────────── */
+.sch-bp-section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--pms-muted-2);
+  margin-bottom: 0.4rem;
+}
+
+.sch-bp-label-icon {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+/* ── Body ────────────────────────────────────────────────── */
+.sch-bp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.sch-bp-empty {
+  padding: 1.5rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--pms-muted-2);
+}
+
+.sch-bp-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.75rem;
+  color: var(--pms-muted-2);
+}
+
+/* Time slot chips */
+.sch-bp-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+.sch-bp-slot {
+  padding: 0.45rem 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid var(--pms-border);
+  border-radius: var(--pms-radius-control);
+  background: var(--pms-canvas);
+  color: var(--pms-text-strong);
+  cursor: pointer;
+  transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+  white-space: nowrap;
+}
+.sch-bp-slot:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: var(--pms-primary);
+}
+.sch-bp-slot--active {
+  background: var(--pms-primary);
+  border-color: var(--pms-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Patient field */
+.sch-bp-field {
+  position: relative;
+}
+
+.sch-bp-search-wrap {
+  position: relative;
+}
+
+/* Selected patient card */
+.sch-bp-patient-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--pms-radius-control);
+}
+
+.sch-bp-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--pms-primary);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.sch-bp-patient-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.sch-bp-patient-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sch-bp-patient-meta {
+  font-size: 0.75rem;
+  color: #3b82f6;
+}
+
+.sch-bp-insurance-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  width: fit-content;
+}
+
+.sch-bp-ins-icon {
+  font-size: 0.65rem;
+  line-height: 1;
+}
+
+.sch-bp-patient-clear {
+  border: none;
+  background: transparent;
+  color: #3b82f6;
+  cursor: pointer;
+  line-height: 1;
+  font-size: 0.875rem;
+  padding: 0.25rem;
+  flex-shrink: 0;
+}
+.sch-bp-patient-clear:hover { color: #1d4ed8; }
+
+/* Autocomplete dropdown */
+.sch-bp-results {
+  position: absolute;
+  z-index: 10;
+  margin-top: 0.25rem;
+  width: 100%;
+  max-height: 12rem;
+  overflow-y: auto;
+  background: var(--pms-surface);
+  border: 1px solid var(--pms-border);
+  border-radius: var(--pms-radius-control);
+  box-shadow: 0 10px 24px rgb(15 23 42 / 0.12);
+}
+
+.sch-bp-result {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--pms-hairline);
+  cursor: pointer;
+  color: var(--pms-text-strong);
+}
+.sch-bp-result:last-child { border-bottom: none; }
+.sch-bp-result:hover { background: #eff6ff; }
+
+.sch-bp-result-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--pms-canvas);
+  border: 1px solid var(--pms-border);
+  color: var(--pms-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.sch-bp-result-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.sch-bp-result-meta {
+  font-size: 0.75rem;
+  color: var(--pms-muted-2);
+}
+
+/* Reason textarea */
+textarea.ui-input { resize: vertical; min-height: 3rem; }
+
+/* Inline error */
+.sch-bp-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  border-radius: var(--pms-radius-control);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  color: #b91c1c;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.sch-bp-foot {
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--pms-border);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* Confirmation summary strip */
+.sch-bp-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.65rem;
+  background: var(--pms-canvas);
+  border: 1px solid var(--pms-border);
+  border-radius: var(--pms-radius-control);
+  font-size: 0.8125rem;
+  color: var(--pms-text-strong);
+  overflow: hidden;
+}
+
+.sch-bp-summary-icon {
+  font-size: 0.875rem;
+  line-height: 1;
+  color: var(--pms-primary);
+  flex-shrink: 0;
+}
+
+.sch-bp-summary-patient {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sch-bp-summary-sep {
+  color: var(--pms-muted-2);
+  flex-shrink: 0;
+}
+
+/* ── Desktop: 2-column form grid ─────────────────────────── */
+@media (min-width: 1024px) {
+  .sch-bp-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+    overflow-y: visible;
+  }
+
+  /* Time chips occupy the left column for both content rows so that
+     patient + reason stack in the right column instead of below chips.
+     Body height becomes max(chips, patient+reason) instead of chips+reason. */
+  .sch-bp-time   { grid-column: 1; grid-row: 1 / 3; }
+  .sch-bp-field  { grid-column: 2; grid-row: 1; }
+  .sch-bp-reason { grid-column: 2; grid-row: 2; }
+  .sch-bp-error  { grid-column: 1 / 3; }
+}

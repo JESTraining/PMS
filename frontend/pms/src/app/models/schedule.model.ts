@@ -19,11 +19,34 @@ export interface ScheduleFilter {
   patientName?: string;
 }
 
+/** Payload for POST /api/Appointments (matches backend AppointmentRequestRecord). */
 export interface CreateAppointmentDto {
   startTime: string;
   endTime: string;
-  status: string;
   reason: string;
-  doctor: { id: number };
-  patient: { id: number };
+  doctorId: number;
+  patientId: number;
+  status?: string; // ignored by backend; retained for the legacy modal during migration
+}
+
+/** Result of GET /api/Appointments/availability. */
+export interface AvailabilityResult {
+  isAvailable: boolean;
+  errorMessage: string;
+}
+
+export interface DaySummary {
+  total: number;
+  scheduled: number;
+  inProgress: number;
+  completed: number;
+  free: number;
+  restRange: string | null;
+}
+
+export interface NextSlot {
+  key: string;
+  dateLabel: string;
+  time: string;
+  date: Date;
 }

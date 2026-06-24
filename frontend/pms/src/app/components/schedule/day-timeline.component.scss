@@ -1,0 +1,203 @@
+.sch-tl {
+  display: flex;
+  background: var(--pms-surface);
+}
+
+/* Time gutter — canvas-tinted so it reads as a "label zone" vs the white track */
+.sch-tl-gutter {
+  width: 4rem;
+  flex-shrink: 0;
+  border-right: 1px solid var(--pms-border);
+  background: var(--pms-canvas);
+}
+.sch-tl-gutter-cell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0.25rem 0.5rem 0 0;
+  font-size: 0.7rem;
+  color: var(--pms-muted-2);
+}
+/* Bold labels on the hour (every other cell = :00 slots) */
+.sch-tl-gutter-cell:nth-child(odd) {
+  font-weight: 600;
+  color: var(--pms-muted);
+}
+
+/* Track */
+.sch-tl-track {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.sch-tl-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 0.6);
+  font-size: 0.875rem;
+  color: var(--pms-muted);
+}
+
+.sch-tl-past {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 0;
+  background: rgb(244 63 94 / 0.06); /* rose tint */
+}
+
+/* Slots (booking targets) */
+.sch-tl-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 0.85rem;
+  border-bottom: 1px solid var(--pms-hairline);
+  font-size: 0.75rem;
+  text-align: left;
+  background: transparent;
+  transition: background 0.12s ease;
+}
+/* Hourly band: every :00 slot (odd DOM order) gets a very faint stripe */
+.sch-tl-slot:nth-child(odd) { background: rgb(15 23 42 / 0.018); }
+.sch-tl-slot:not(:disabled) { cursor: pointer; }
+.sch-tl-slot:not(:disabled):hover { background: #eff6ff; }
+.sch-tl-slot:disabled { cursor: default; }
+.sch-tl-slot-free { font-style: italic; color: #cbd5e1; }
+.sch-tl-slot-past { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; color: #fda4af; }
+
+/* Event blocks */
+.sch-tl-event {
+  position: absolute;
+  left: 0.25rem;
+  right: 0.5rem;
+  z-index: 10;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  padding: 0.4rem 0.75rem 0.4rem 1rem; /* extra left space for the accent stripe */
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.05);
+  background: #fff;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+/* Left-accent stripe: colored bar tied to status */
+.sch-tl-event::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+.sch-tl-event--scheduled::before  { background: #3b82f6; }
+.sch-tl-event--inprogress::before { background: #f59e0b; }
+.sch-tl-event--completed::before  { background: #22c55e; }
+.sch-tl-event--rest::before       { background: #94a3b8; }
+
+.sch-tl-event--draggable { cursor: grab; }
+.sch-tl-event--draggable:hover {
+  box-shadow: 0 4px 12px rgb(15 23 42 / 0.12), 0 2px 4px rgb(15 23 42 / 0.07);
+  transform: translateY(-1px);
+}
+.sch-tl-event--draggable:active { cursor: grabbing; }
+
+.sch-tl-event--scheduled { background: #eff6ff; border-color: #93c5fd; }
+.sch-tl-event--inprogress { background: #fffbeb; border-color: #fcd34d; }
+.sch-tl-event--completed { background: #f0fdf4; border-color: #86efac; }
+.sch-tl-event--rest {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 6px,
+    rgb(148 163 184 / 0.12) 6px,
+    rgb(148 163 184 / 0.12) 12px
+  );
+}
+
+.sch-tl-event-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.sch-tl-event-time { font-size: 0.72rem; font-weight: 600; color: var(--pms-text-strong); }
+.sch-tl-event-status {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sch-tl-event--scheduled .sch-tl-event-status { color: #2563eb; }
+.sch-tl-event--inprogress .sch-tl-event-status { color: #d97706; }
+.sch-tl-event--completed .sch-tl-event-status { color: #16a34a; }
+.sch-tl-event--rest .sch-tl-event-status { color: #64748b; }
+
+.sch-tl-event-text {
+  margin: 0.1rem 0 0;
+  font-size: 0.72rem;
+  color: var(--pms-text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sch-tl-event--rest .sch-tl-event-text { color: #475569; }
+
+.sch-tl-event-actions { margin-top: 0.35rem; display: flex; gap: 0.4rem; }
+
+.sch-tl-act,
+.sch-tl-act-ghost {
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.sch-tl-act { background: var(--pms-primary); color: #fff; }
+.sch-tl-act:hover { background: var(--pms-primary-hover); }
+.sch-tl-act-ghost { background: #fff; color: var(--pms-muted); border-color: #d1d5db; font-weight: 500; }
+.sch-tl-act-ghost:hover { background: #f9fafb; }
+
+/* Current-time indicator */
+.sch-tl-now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  border-top: 2px solid #ef4444;
+}
+.sch-tl-now-dot {
+  position: absolute;
+  top: -0.3rem;
+  left: -0.25rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: #ef4444;
+}
+
+/* Drag interaction (CDK CSS hooks — no @angular/animations) */
+.sch-tl-event.cdk-drag-dragging {
+  z-index: 40;
+  box-shadow: 0 12px 28px rgb(15 23 42 / 0.18);
+  opacity: 0.95;
+}
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sch-tl-slot,
+  .cdk-drag-animating { transition: none; }
+}

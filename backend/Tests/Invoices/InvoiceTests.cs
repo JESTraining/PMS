@@ -8,7 +8,8 @@ namespace Tests.Invoices
 {
     public class InvoiceTests
     {
-        private readonly InvoiceProcess _invoiceProcess = new InvoiceProcess();
+        // These tests exercise only pure domain logic, which does not touch the repository.
+        private readonly InvoiceProcess _invoiceProcess = new InvoiceProcess(null!);
 
         [Fact]
         public void Should_Create_invoice_with_valid_data()
