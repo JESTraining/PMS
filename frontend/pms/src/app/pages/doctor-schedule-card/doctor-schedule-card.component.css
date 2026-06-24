@@ -1,0 +1,105 @@
+.card {
+  display: flex;
+  flex-direction: row-reverse; /* Invierte el orden: Imagen izquierda, Detalles derecha */
+  width: 650px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.card-image-container {
+  width: 240px; /* Ancho fijo para estabilidad del diseño */
+  position: relative;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Evita que la imagen se deforme */
+  display: block;
+}
+
+.card-details {
+  flex: 1; /* Ocupa el espacio restante en la derecha */
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-header {
+  margin-bottom: 20px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.card-subtitle {
+  margin: 6px 0 0 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.card-list-item.disabled {
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.icon {
+  font-weight: bold;
+  color: #22c55e;
+}
+
+.disabled .icon {
+  color: #ef4444;
+}
+
+.card-btn {
+  align-self: flex-start; /* Evita que el botón se estire a lo ancho */
+  padding: 10px 24px;
+  background-color: #4f46e5;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.card-btn:hover {
+  background-color: #4338ca;
+}
+
+@media (max-width: 680px) {
+  .card {
+    flex-direction: column; /* Apila los elementos verticalmente en pantallas chicas */
+    width: 340px;
+  }
+  .card-image-container {
+    width: 100%;
+    height: 200px;
+  }
+}

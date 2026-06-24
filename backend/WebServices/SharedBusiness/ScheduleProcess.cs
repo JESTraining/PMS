@@ -17,6 +17,45 @@ namespace WebServices.SharedBusiness
             _dbContext = dbContext;
         }
 
+        public async Task<List<DoctorScheduleByDate>> GetDoctorsScheduleByDateAsync(DateOnly date)
+        {
+            // Before we can stablish as a configurable parameter, available daily time in hours is being set as 10 hours (from 8:00 to 18:00)
+            // Each Appointemnt/Encounter has a duration of 30 minutes, so we can have 2 appointments per hour, which means 20 appointments per day for each doctor.
+            int totalDailyAvailableAppointments = 10 * 2;
+
+            var scheduleData = await _dbContext.DBScheduleViews
+                .Where(s => s.Date == date
+                    && s.Type == "Appointment"
+                    && s.ScheduleStatus != "Cancelled")
+                .Select(s => new DoctorScheduleByDate
+                {
+                    id = s.DoctorId,
+                    name = s.DoctorName,
+                    totalDateAppointments = _dbContext.DBScheduleViews.Count(sv => sv.DoctorId == s.DoctorId && sv.Date == date && sv.Type == "Appointment" && sv.ScheduleStatus != "Cancelled"),
+                    availableAppointments = totalDailyAvailableAppointments,
+                    pendingAppointments = 0
+                })
+                .ToListAsync();
+
+            var appointmentsOnDate = await _dbContext.Encounters
+                .Where(e => e.StartTime.Date == date.ToDateTime(TimeOnly.MinValue).Date
+                        && e.Status != EncounterStatus.Cancelled)
+                .Select(e => new
+                {
+                    DoctorId = EF.Property<int>(e, "DoctorId"),
+                    AppointmentStatus = e.Status
+                })
+                .ToListAsync();
+
+            scheduleData.ForEach(d =>
+            {
+                d.availableAppointments = totalDailyAvailableAppointments - appointmentsOnDate.Count(a => a.DoctorId == d.id);
+                d.pendingAppointments = appointmentsOnDate.Count(a => a.DoctorId == d.id && a.AppointmentStatus != EncounterStatus.Completed);
+            });
+
+            return scheduleData;
+        }
+
         /// <summary>
         /// Retrieves a filtered list of schedule views based on the provided filter criteria.
         /// </summary>
