@@ -136,7 +136,8 @@
   background: var(--pms-canvas);
   color: var(--pms-text-strong);
   cursor: pointer;
-  transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+  transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease,
+              transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
   white-space: nowrap;
 }
 .sch-bp-slot:hover {
@@ -144,11 +145,15 @@
   border-color: #93c5fd;
   color: var(--pms-primary);
 }
+.sch-bp-slot:not(.sch-bp-slot--active):active {
+  transform: scale(0.93);
+}
 .sch-bp-slot--active {
   background: var(--pms-primary);
   border-color: var(--pms-primary);
   color: #fff;
   font-weight: 600;
+  transform: scale(1.05);
 }
 
 /* Patient field */

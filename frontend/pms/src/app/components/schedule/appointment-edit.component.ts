@@ -4,10 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { ScheduleView } from '../../models/schedule.model';
 import { timeFromIso, addMinutesToLabel } from '../../utils/schedule-time.util';
 
-/**
- * Appointment details modal. Patient and reason are read-only (locked); the time can be
- * changed (saving emits `save`). Hosts the per-appointment actions: start encounter, cancel.
- */
 @Component({
   selector: 'app-appointment-edit',
   standalone: true,

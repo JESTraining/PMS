@@ -2,6 +2,12 @@
 :host {
   display: none;
   font-size: 0.875rem;
+  animation: cardFadeIn 180ms ease;
+}
+
+@keyframes cardFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @media (min-width: 1024px) {

@@ -33,29 +33,17 @@ import { ConfirmState } from '../../models/confirm-dialog.model';
   styleUrl: './schedule.component.scss',
   template: `
     <div class="sch">
-      <!-- Page header: icon + title + primary action -->
-      <header class="sch-header">
-        <div class="sch-header-left">
-          <span class="material-icons sch-header-icon">calendar_month</span>
+
+      <!-- Top bar: icon + title | doctor search | date nav | primary action -->
+      <div class="sch-topbar">
+        <div class="sch-topbar-brand">
+          <span class="material-icons sch-topbar-icon">calendar_month</span>
           <div>
-            <h1 class="ui-page-title">
-              Schedule
-              <span class="sch-header-date">· {{ today | date: 'EEE, MMM d' }}</span>
-            </h1>
-            <p class="ui-page-subtitle">View a doctor's day and book appointments.</p>
+            <span class="sch-topbar-title">Schedule</span>
+            <span class="sch-topbar-date">· {{ today | date: 'EEE, MMM d' }}</span>
           </div>
         </div>
-        @if (timelineDoctor()) {
-          <button class="ui-btn ui-btn-primary" (click)="openBooking(null)" [disabled]="availableSlots().length === 0">
-            <span class="material-icons text-lg">add</span>
-            New appointment
-          </button>
-        }
-      </header>
-
-      <!-- Controls bar: doctor search + date navigation -->
-      <div class="ui-card sch-controls">
-        <div class="sch-controls-search">
+        <div class="sch-topbar-search">
           <app-doctor-search
             [doctors]="doctors()"
             [selected]="selectedDoctor()"
@@ -72,6 +60,12 @@ import { ConfirmState } from '../../models/confirm-dialog.model';
           </button>
           <button class="ui-btn ui-btn-outline" (click)="goToday()">Today</button>
         </div>
+        @if (timelineDoctor()) {
+          <button class="ui-btn ui-btn-primary sch-topbar-action" (click)="openBooking(null)" [disabled]="availableSlots().length === 0">
+            <span class="material-icons text-lg">add</span>
+            New appointment
+          </button>
+        }
       </div>
 
       <!-- Main body -->
@@ -91,15 +85,8 @@ import { ConfirmState } from '../../models/confirm-dialog.model';
             (dropBlocked)="showToast('error', $event)"
             (editRequested)="openEdit($event)" />
 
-          <!-- Side column: next-available + booking panel or day overview -->
+          <!-- Side column: day overview + next-available, or booking panel -->
           <aside class="sch-side" [class.sch-side--booking]="bookingOpen()">
-            @if (!bookingOpen()) {
-              <app-schedule-next-available
-                class="ui-card"
-                [slots]="nextSlots()"
-                [doctorFirstName]="doc.name.split(' ')[0]"
-                (slotJumped)="jumpToSlot($event)" />
-            }
 
             @if (bookingOpen()) {
               <div class="sch-side-backdrop" (click)="closeBooking()"></div>
@@ -114,7 +101,16 @@ import { ConfirmState } from '../../models/confirm-dialog.model';
                   (closed)="closeBooking()" />
               </div>
             } @else {
-              <app-schedule-day-overview class="ui-card ui-card-pad" [summary]="daySummary()" />
+              <!-- Day overview first — orientation before action -->
+              <app-schedule-day-overview
+                class="ui-card ui-card-pad"
+                [summary]="daySummary()" />
+
+              <app-schedule-next-available
+                class="ui-card"
+                [slots]="nextSlots()"
+                [doctorFirstName]="doc.name.split(' ')[0]"
+                (slotJumped)="jumpToSlot($event)" />
             }
           </aside>
 

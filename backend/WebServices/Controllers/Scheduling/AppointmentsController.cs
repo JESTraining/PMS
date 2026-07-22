@@ -68,7 +68,7 @@ namespace WebServices.Controllers.Scheduling
         /// <param name="filter">The filtering criteria.</param>
         /// <returns>A list of scheduled events matching the criteria.</returns>
         [HttpPost("search")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<List<ScheduleView>>> GetAppointments([FromBody] ScheduleFilter filter)
         {
             var validationProcess = new TokenValidationProcess(_config, _context);
@@ -87,7 +87,7 @@ namespace WebServices.Controllers.Scheduling
         /// </summary>
         /// <param name="id">The unique identifier of the appointment.</param>
         [HttpGet("AppointmentDetails/{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<ScheduleView>> AppointmentDetails(int id)
         {
             var authResult = await ValidateAuthorizationAsync();
@@ -116,7 +116,7 @@ namespace WebServices.Controllers.Scheduling
         /// Checks whether a proposed time slot is available for a doctor (no overlap with appointments or rest periods).
         /// </summary>
         [HttpGet("availability")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> CheckAvailability([FromQuery] int doctorId, [FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             var authResult = await ValidateAuthorizationAsync();
@@ -130,7 +130,7 @@ namespace WebServices.Controllers.Scheduling
         /// Creates a new medical appointment.
         /// </summary>
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<UpsertRequest>> CreateAppointment([FromBody] AppointmentRequestRecord request)
         {
             var authResult = await ValidateAuthorizationAsync();
@@ -159,7 +159,7 @@ namespace WebServices.Controllers.Scheduling
         /// Updates an existing appointment: reschedule (StartTime+EndTime) and/or change status (e.g. soft-cancel).
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> Edit(int id, [FromBody] AppointmentUpdateRecord request)
         {
             var authResult = await ValidateAuthorizationAsync();

@@ -19,7 +19,8 @@ export class ScheduleService {
   readonly scheduleResource = httpResource<ScheduleView[]>(
     () => {
       const doctorId = this.selectedDoctorId();
-      if (!doctorId) return undefined; // no doctor selected -> no request
+      if (!doctorId) return undefined;
+      if (!getPmsToken()) return undefined; // no token on SSR or when logged out
       return {
         url: `${this.apiUrl}/search`,
         method: 'POST',

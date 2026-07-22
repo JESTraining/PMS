@@ -70,28 +70,28 @@ const PX_PER_MIN = 1.8; // 30-min slot = 54px
         <!-- Event blocks -->
         @for (pe of positionedEvents(); track pe.ref.type + '-' + pe.ref.id) {
           <div class="sch-tl-event"
-               [ngClass]="blockClasses(pe)"
-               [class.sch-tl-event--draggable]="isDraggable(pe)"
-               [style.top.px]="pe.top"
-               [style.height.px]="pe.height"
-               cdkDrag
-               cdkDragLockAxis="y"
-               cdkDragBoundary=".timeline-track"
-               [cdkDragDisabled]="!isDraggable(pe)"
-               (cdkDragStarted)="onDragStarted()"
-               (cdkDragEnded)="onDragEnded($event, pe)"
-               (click)="onBlockClick(pe)">
-            <div class="sch-tl-event-head">
-              <span class="sch-tl-event-time">{{ pe.timeLabel }}</span>
-              <span class="sch-tl-event-status">{{ pe.isRest ? 'Rest' : pe.status }}</span>
-            </div>
+                 [ngClass]="blockClasses(pe)"
+                 [class.sch-tl-event--draggable]="isDraggable(pe)"
+                 [style.top.px]="pe.top"
+                 [style.height.px]="pe.height"
+                 cdkDrag
+                 cdkDragLockAxis="y"
+                 cdkDragBoundary=".timeline-track"
+                 [cdkDragDisabled]="!isDraggable(pe)"
+                 (cdkDragStarted)="onDragStarted()"
+                 (cdkDragEnded)="onDragEnded($event, pe)"
+                 (click)="onBlockClick(pe)">
+              <div class="sch-tl-event-head">
+                <span class="sch-tl-event-time">{{ pe.timeLabel }}</span>
+                <span class="sch-tl-event-status">{{ pe.isRest ? 'Rest' : pe.status }}</span>
+              </div>
 
-            @if (pe.isRest) {
-              <p class="sch-tl-event-text">{{ pe.ref.scheduleDescription }}</p>
-            } @else {
-              <p class="sch-tl-event-text"><strong>{{ pe.ref.patientName }}</strong> · {{ pe.ref.scheduleDescription }}</p>
-            }
-          </div>
+              @if (pe.isRest) {
+                <p class="sch-tl-event-text">{{ pe.ref.scheduleDescription }}</p>
+              } @else {
+                <p class="sch-tl-event-text"><strong>{{ pe.ref.patientName }}</strong> · {{ pe.ref.scheduleDescription }}</p>
+              }
+            </div>
         }
 
         <!-- Current-time indicator -->

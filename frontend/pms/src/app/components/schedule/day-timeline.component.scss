@@ -88,6 +88,12 @@
   box-shadow: 0 2px 6px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.05);
   background: #fff;
   transition: box-shadow 0.15s ease, transform 0.15s ease;
+  animation: eventFadeIn 200ms ease;
+}
+
+@keyframes eventFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Left-accent stripe: colored bar tied to status */
@@ -199,5 +205,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sch-tl-slot,
-  .cdk-drag-animating { transition: none; }
+  .sch-tl-event,
+  .cdk-drag-animating { transition: none; animation: none; }
 }

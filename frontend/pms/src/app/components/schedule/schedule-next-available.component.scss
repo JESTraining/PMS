@@ -1,6 +1,12 @@
 /* Host never grows — the booking panel below gets all remaining flex space */
 :host {
   flex-shrink: 0;
+  animation: cardFadeIn 180ms ease;
+}
+
+@keyframes cardFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .sch-na-head {
