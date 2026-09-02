@@ -1,7 +1,12 @@
 name: Bulk Import Issues
+
 on:
   workflow_dispatch:
-    # Allows you to trigger it manually
+
+
+permissions:
+  contents: read
+  issues: write
 
 jobs:
   import:
@@ -10,9 +15,110 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Import Issues
-      uses: github/marketplace/actions/issue-importer-action@v1 # Verify latest version
+    - name: Import tasks.csv as issues
+      uses: actions/github-script@v7
       with:
-        file-path: './tasks.csv'
-        file-format: 'csv'
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.TASK_GENERATOR }}
+        script: |
+          const fs = require('node:fs');
+
+          const filePath = 'docs/tasks.csv';
+          if (!fs.existsSync(filePath)) {
+            core.setFailed(`CSV file not found: ${filePath}`);
+            return;
+          }
+
+          const parseCsv = (content) => {
+            const rows = [];
+            let row = [];
+            let field = '';
+            let quoted = false;
+
+            for (let index = 0; index < content.length; index += 1) {
+              const character = content[index];
+              const nextCharacter = content[index + 1];
+
+              if (character === '"' && quoted && nextCharacter === '"') {
+                field += '"';
+                index += 1;
+              } else if (character === '"') {
+                quoted = !quoted;
+              } else if (character === ',' && !quoted) {
+                row.push(field);
+                field = '';
+              } else if ((character === '\n' || character === '\r') && !quoted) {
+                if (character === '\r' && nextCharacter === '\n') {
+                  index += 1;
+                }
+                row.push(field);
+                if (row.some((value) => value.trim() !== '')) {
+                  rows.push(row);
+                }
+                row = [];
+                field = '';
+              } else {
+                field += character;
+              }
+            }
+
+            if (field !== '' || row.length > 0) {
+              row.push(field);
+              if (row.some((value) => value.trim() !== '')) {
+                rows.push(row);
+              }
+            }
+
+            return rows;
+          };
+
+          const rows = parseCsv(fs.readFileSync(filePath, 'utf8'));
+          const headers = rows.shift()?.map((header) => header.trim());
+          const requiredHeaders = ['Title', 'Body', 'Labels', 'Milestone', 'Assignees'];
+
+          if (!headers || requiredHeaders.some((header) => !headers.includes(header))) {
+            core.setFailed(`CSV must contain headers: ${requiredHeaders.join(', ')}`);
+            return;
+          }
+
+          const column = Object.fromEntries(headers.map((header, index) => [header, index]));
+          const { owner, repo } = context.repo;
+          const existingIssues = await github.paginate(github.rest.issues.listForRepo, {
+            owner,
+            repo,
+            state: 'all',
+            per_page: 100,
+          });
+          const existingTitles = new Set(existingIssues.map((issue) => issue.title));
+
+          const milestones = await github.paginate(github.rest.issues.listMilestones, {
+            owner,
+            repo,
+            state: 'all',
+            per_page: 100,
+          });
+          const milestoneIds = new Map(milestones.map((milestone) => [milestone.title, milestone.number]));
+
+          for (const values of rows) {
+            const task = Object.fromEntries(requiredHeaders.map((header) => [header, values[column[header]]?.trim() ?? '']));
+            if (!task.Title || existingTitles.has(task.Title)) {
+              core.info(`Skipping existing or blank issue: ${task.Title || '(blank)'}`);
+              continue;
+            }
+
+            const labels = task.Labels.split(',').map((label) => label.trim()).filter(Boolean);
+            const assignees = task.Assignees.split(',').map((assignee) => assignee.trim()).filter((assignee) => assignee && assignee !== 'unassigned');
+            const milestone = milestoneIds.get(task.Milestone);
+
+            const issue = await github.rest.issues.create({
+              owner,
+              repo,
+              title: task.Title,
+              body: task.Body,
+              labels,
+              assignees,
+              ...(milestone ? { milestone } : {}),
+            });
+
+            existingTitles.add(task.Title);
+            core.info(`Created issue #${issue.data.number}: ${task.Title}`);
+          }
