@@ -89,5 +89,4 @@ TestResults/
 logs/
 *.log
 backend/WebServices/appsettings.Development.json
-/.github
 /ai
